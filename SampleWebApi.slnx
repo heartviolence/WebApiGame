@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="SampleWebApi/SampleWebApi.csproj" />
+  <Project Path="Shared/Shared.csproj" />
+</Solution>

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using SampleWebApi.Model;
+using SampleWebApi.Service;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -13,34 +13,52 @@ namespace SampleWebApi.Controllers
     public class LoginController : ControllerBase
     {
         IConfiguration _configuration;
-        public LoginController(IConfiguration configuration)
+        ILogger _logger;
+        UserService _userService;
+        public LoginController(IConfiguration configuration, UserService userService, ILogger<LoginController> logger)
         {
             this._configuration = configuration;
+            this._userService = userService;
+            this._logger = logger;
         }
 
-        [HttpPost()]
+        [HttpPost]
+        public async Task<RegisterResponse> Register([FromBody] LoginRequest request)
+        {
+            if (await _userService.RegisterNewUser(request.Username, request.Password))
+            {
+                return new RegisterResponse() { IsSuccess = true };
+            }
+            return new RegisterResponse() { IsSuccess = false, Message = "유저가 이미존재함" };
+        }
+
+        [HttpPost]
         public async Task<LoginResponse> Login([FromBody] LoginRequest request)
         {
-            if (request.Username == "admin" && request.Password == "password")
+            var checkResult = await _userService.GetUserIdFromUsername(request.Username);
+            if (checkResult.isExist)
             {
-                return new LoginResponse() { IsSuccess = true, Token = LoginToken(request) };
+                _logger.LogInformation("유저 로그인성공, username: {Username},userId {UserId}", request.Username, checkResult.userId);
+                return new LoginResponse() { IsSuccess = true, UserId = checkResult.userId, Token = LoginToken(request, checkResult.userId) };
             }
 
+            _logger.LogInformation("유저 로그인실패, username: {Username}", request.Username);
             return new LoginResponse() { IsSuccess = false };
         }
 
         [HttpGet]
-        [Authorize(AuthenticationSchemes =JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public IResult LoginTest()
         {
             return Results.Ok();
         }
 
-        string LoginToken(LoginRequest request)
+        string LoginToken(LoginRequest request, int userId)
         {
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, request.Username),
+                new Claim("userId", userId.ToString()),
                 new Claim(ClaimTypes.Role, "Administrator")
             };
 
