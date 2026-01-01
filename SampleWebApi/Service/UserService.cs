@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SampleWebApi.Model.DbContexts;
+using SampleWebApi.Model.Events;
 
 namespace SampleWebApi.Service
 {
@@ -44,11 +45,21 @@ namespace SampleWebApi.Service
                     Password = password
                 };
 
-                user.Characters.Add(new GameCharacter() { CharacterID = CharacterId.Character_Sora });
+                user.Characters.Add(new GameCharacter() { CharacterID = CharacterId.Sora });
+                var userCreateEvent = Create_UserCreateEvent(username);
                 context.UserInfos.Add(user);
+                context.GameEvents.Add(userCreateEvent.CovertToGameEvent());
                 await context.SaveChangesAsync();
             }
             return true;
+        }
+
+        UserCreateEvent Create_UserCreateEvent(string username)
+        {
+            return new UserCreateEvent()
+            {
+                Username = username
+            };
         }
     }
 }

@@ -50,6 +50,6 @@ namespace SampleWebApi.Controllers
             await _characterService.Gacha(userId);
             _logger.LogInformation("캐릭터 추가 성공 userId:{UserId}", userId);
             return Ok();
-        } 
+        }
     }
 }

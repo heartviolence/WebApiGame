@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="SampleWebApi/SampleWebApi.csproj" />
+  <Project Path="ServerTest/ServerTest.csproj" Id="1211ebe6-dea1-4a7e-83bb-9f928a4ee6d4" />
   <Project Path="Shared/Shared.csproj" />
 </Solution>
