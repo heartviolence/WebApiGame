@@ -8,19 +8,16 @@ namespace SampleWebApi.Service
 {
     public class CharacterService
     {
-        List<string> allCharacters = new();
         Random random = new();
-        public CharacterService()
+        GameCharacterDataProvider _gameCharacterData;
+        public CharacterService(GameCharacterDataProvider gameCharacterData)
         {
-            allCharacters.Add(CharacterId.Sora);
-            allCharacters.Add(CharacterId.Sia);
-            allCharacters.Add(CharacterId.Nora);
-            allCharacters.Add(CharacterId.Flora);
+            this._gameCharacterData = gameCharacterData;
         }
 
         public async Task<List<GameCharacter>> GetCharacters(int userId)
         {
-            using (var context = new UserInfoContext())
+            using (var context = new GameDbContext())
             {
                 List<GameCharacter> characters = await context.UserInfos
                     .Where(u => u.Id == userId)
@@ -33,7 +30,7 @@ namespace SampleWebApi.Service
 
         public async Task Gacha(int userId)
         {
-            using (var context = new UserInfoContext())
+            using (var context = new GameDbContext())
             {
                 var userData = await context.UserInfos
                     .Include(u => u.Characters)
@@ -59,7 +56,9 @@ namespace SampleWebApi.Service
         string CharacterGachaOtherOne(IEnumerable<string> characterCodes)
         {
             //가진캐릭의 여집합
-            var complement = allCharacters.Except(characterCodes).ToList();
+            var complement = _gameCharacterData.GameCharacterData.Select(e => e.Key)
+                                                .Except(characterCodes)
+                                                .ToList();
             if (complement.Count == 0)
             {
                 return string.Empty;

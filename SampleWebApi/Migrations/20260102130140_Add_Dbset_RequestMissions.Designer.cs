@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SampleWebApi.Model.DbContexts;
 
@@ -11,9 +12,11 @@ using SampleWebApi.Model.DbContexts;
 namespace SampleWebApi.Migrations
 {
     [DbContext(typeof(GameDbContext))]
-    partial class UserInfoContextModelSnapshot : ModelSnapshot
+    [Migration("20260102130140_Add_Dbset_RequestMissions")]
+    partial class Add_Dbset_RequestMissions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -21,5 +21,9 @@ namespace SampleWebApi.Model.DbContexts
         public string? Nickname { get; set; }
 
         public List<GameCharacter> Characters { get; set; } = new();
+
+        public int Crystal { get; set; }
+
+        public List<RequestMission> RequestMissions { get; set; } = new();
     }
 }

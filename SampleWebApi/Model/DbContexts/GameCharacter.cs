@@ -12,5 +12,6 @@
         public int B_Skill_Level { get; set; } = 1;
 
         public int StarLevel { get; set; } = 0;
-    }
+    }   
+
 }

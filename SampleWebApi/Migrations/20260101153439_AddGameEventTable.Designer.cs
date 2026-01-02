@@ -10,7 +10,7 @@ using SampleWebApi.Model.DbContexts;
 
 namespace SampleWebApi.Migrations
 {
-    [DbContext(typeof(UserInfoContext))]
+    [DbContext(typeof(GameDbContext))]
     [Migration("20260101153439_AddGameEventTable")]
     partial class AddGameEventTable
     {

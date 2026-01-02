@@ -44,6 +44,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<CharacterService>();
+builder.Services.AddScoped<RequestMissionService>();
+builder.Services.AddScoped<RequestMissionProvider>();
+builder.Services.AddScoped<GameCharacterDataProvider>();
 
 var app = builder.Build();
 

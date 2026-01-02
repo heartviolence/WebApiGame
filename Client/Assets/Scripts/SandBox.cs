@@ -1,5 +1,7 @@
+using Assets.Scripts.Shared;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -13,6 +15,11 @@ public class SandBox : MonoBehaviour
     LoginResponse _loginResult;
 
     public Button GachaButton;
+    public Button CharacterDeleteButton;
+    public Button RequestMissionStartButton;
+    public Button RequestMissionCompleteButton;
+
+    List<GameCharacterDTO> _characters = new();
     void Start()
     {
         _client = new HttpClient();
@@ -20,6 +27,9 @@ public class SandBox : MonoBehaviour
         _client.Timeout = TimeSpan.FromSeconds(5);
 
         GachaButton.onClick.AddListener(() => GachaTest());
+        CharacterDeleteButton.onClick.AddListener(() => DeleteAll());
+        RequestMissionStartButton.onClick.AddListener(() => RequestMissionStart());
+        RequestMissionCompleteButton.onClick.AddListener(() => RequestMissionCompleteCheck());
         LoginCall();
     }
 
@@ -90,9 +100,9 @@ public class SandBox : MonoBehaviour
             Debug.Log($"CharacterCallTestSuccess");
             if (response.Content.Headers.ContentLength > 0)
             {
-                var result = await response.Content.ReadFromJsonAsync<List<GameCharacterDTO>>();
+                _characters = await response.Content.ReadFromJsonAsync<List<GameCharacterDTO>>();
                 Debug.Log("Character Info---------------------------");
-                foreach (var character in result)
+                foreach (var character in _characters)
                 {
                     Debug.Log($"Character ID: {character.CharacterID}, Level: {character.Level}, EXP: {character.EXP}");
                 }
@@ -150,6 +160,55 @@ public class SandBox : MonoBehaviour
         catch (Exception ex)
         {
             Debug.LogError($"Gacha Call Failed: {ex.Message}");
+        }
+    }
+
+    async Task DeleteAll()
+    {
+        Debug.Log("Starting DeleteAll Test");
+        try
+        {
+            HttpResponseMessage response = await _client.DeleteAsync($"Character/DeleteAll");
+            response.EnsureSuccessStatusCode();
+            await CharacterCallTest();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"DeleteAll Call Failed: {ex.Message}");
+        }
+    }
+
+    async Task RequestMissionStart()
+    {
+        Debug.Log("Starting RequestMissionStart Call...");
+        try
+        {
+            var requestBody = new RequestMissionStartRequest()
+            {
+                MissionCode = "00-00-01",
+                CharacterCode = new() { "00_01", "00_04" }
+            };
+            HttpResponseMessage response = await _client.PostAsJsonAsync($"RequestMission/StartMission", requestBody);
+            response.EnsureSuccessStatusCode();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"RequestMissionStart Call Failed: {ex.Message}");
+        }
+    }
+
+
+    async Task RequestMissionCompleteCheck()
+    {
+        Debug.Log("Starting RequestMissionCompleteCheck Call...");
+        try
+        {
+            HttpResponseMessage response = await _client.PutAsync($"RequestMission/RequestMissionCompleteCheck", new StringContent(""));
+            response.EnsureSuccessStatusCode();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"RequestMissionCompleteCheck Call Failed: {ex.Message}");
         }
     }
 }

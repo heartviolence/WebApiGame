@@ -10,7 +10,7 @@ using SampleWebApi.Model.DbContexts;
 
 namespace SampleWebApi.Migrations
 {
-    [DbContext(typeof(UserInfoContext))]
+    [DbContext(typeof(GameDbContext))]
     [Migration("20251225153851_InitialCreate")]
     partial class InitialCreate
     {

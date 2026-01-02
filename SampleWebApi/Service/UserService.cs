@@ -12,7 +12,7 @@ namespace SampleWebApi.Service
 
         public async Task<(bool isExist, int userId)> GetUserIdFromUsername(string username)
         {
-            using (var context = new UserInfoContext())
+            using (var context = new GameDbContext())
             {
                 var user = await context.UserInfos
                     .Where(u => u.Username == username)
@@ -28,7 +28,7 @@ namespace SampleWebApi.Service
 
         public async Task<bool> RegisterNewUser(string username, string password)
         {
-            using (var context = new UserInfoContext())
+            using (var context = new GameDbContext())
             {
                 var userExist = await context.UserInfos
                     .Where(u => u.Username == username)
