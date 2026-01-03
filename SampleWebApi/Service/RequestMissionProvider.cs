@@ -3,7 +3,7 @@ using SampleWebApi.Model.RequestMissions;
 
 namespace SampleWebApi.Service
 {
-    public class RequestMissionProvider
+    public class RequestMissionProvider : IRequestMissionProvider
     {
         public Dictionary<string, RequestMissionSheetRecord> Missions { get; private set; }
         public RequestMissionProvider()

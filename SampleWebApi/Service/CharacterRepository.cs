@@ -6,11 +6,11 @@ using System.Runtime.CompilerServices;
 
 namespace SampleWebApi.Service
 {
-    public class CharacterService
+    public class CharacterRepository
     {
         Random random = new();
-        GameCharacterDataProvider _gameCharacterData;
-        public CharacterService(GameCharacterDataProvider gameCharacterData)
+        IGameCharacterDataProvider _gameCharacterData;
+        public CharacterRepository(IGameCharacterDataProvider gameCharacterData)
         {
             this._gameCharacterData = gameCharacterData;
         }

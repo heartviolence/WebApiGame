@@ -1,90 +1,34 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SampleWebApi.Model.Characters;
+﻿using SampleWebApi.Model.Characters;
 using SampleWebApi.Model.DbContexts;
 using SampleWebApi.Model.Events;
 using SampleWebApi.Model.Items;
 using SampleWebApi.Model.RequestMissions;
+using System.Reflection;
 
 namespace SampleWebApi.Service
 {
     public class RequestMissionService
     {
-        RequestMissionProvider _missionProvider;
-        GameCharacterDataProvider _gameCharacterDataProvider;
         ILogger _logger;
-        public RequestMissionService(RequestMissionProvider missionProvider, GameCharacterDataProvider gameCharacterDataProvider, ILogger<RequestMissionService> logger)
+        IRequestMissionProvider _missionProvider;
+        IGameCharacterDataProvider _gameCharacterDataProvider;
+        public RequestMissionService(IRequestMissionProvider missionProvider, IGameCharacterDataProvider gameCharacterDataProvider, ILogger<RequestMissionService> logger)
         {
             this._missionProvider = missionProvider;
             this._gameCharacterDataProvider = gameCharacterDataProvider;
             this._logger = logger;
         }
 
-        public async Task<bool> StartMission(int userId, string missionCode, List<string> characterCodes)
+        public bool IsValidCharacterCodes(List<string> characterCodes)
         {
-            if (!IsValidCharacterCodes(characterCodes))
+            var originCount = characterCodes.Count;
+
+            if (originCount == 0)
             {
+                _logger.LogWarning("캐릭터코드 0개");
                 return false;
             }
 
-            using (var context = new GameDbContext())
-            {
-                var user = await context.UserInfos.Where(u => u.Id == userId)
-                    .Include(u => u.Characters)
-                    .Include(u => u.RequestMissions)
-                    .FirstOrDefaultAsync();
-
-                if (!IsValidMissionCode(user.RequestMissions, missionCode))
-                {
-                    return false;
-                }
-
-                var characters = user.Characters.Where(c => characterCodes.Contains(c.CharacterID)).ToList();
-                if (characters.Count != characterCodes.Count)
-                {
-                    _logger.LogWarning("요청 캐릭터 코드에 해당하는 캐릭터가 존재하지않음");
-                    return false;
-                }
-
-                var missionSuccess = IsMissionSuccess(missionCode, characters);
-                if (!missionSuccess)
-                {
-                    _logger.LogWarning("미션 조건에 부합하지않음");
-                    return false;
-                }
-
-                user.RequestMissions.Add(RequestMission.Create(missionCode));
-                context.GameEvents.Add(RequestMissionStartEvent.Create(userId, missionCode, characterCodes).CovertToGameEvent());
-
-                await context.SaveChangesAsync();
-            }
-            return true;
-        }
-
-        public async Task RequestMissionCompleteCheck(int userId)
-        {
-            using (var context = new GameDbContext())
-            {
-                var user = await context.UserInfos.Where(u => u.Id == userId)
-                    .Include(u => u.RequestMissions)
-                    .FirstOrDefaultAsync();
-
-                var completeMissions = user.RequestMissions.Where(m => m.StartTime + TimeSpan.FromSeconds(10) <= DateTime.Now);
-                var missionsRewards = completeMissions.Select(m => _missionProvider.Missions[m.MissionCode].Rewards);
-                foreach (var rewards in missionsRewards)
-                {
-                    foreach (var reward in rewards)
-                    {
-                        context.GameEvents.Add(ProcessGetRewards(user, reward).CovertToGameEvent());
-                    }
-                }
-                context.RequestMissions.RemoveRange(completeMissions);
-                await context.SaveChangesAsync();
-            }
-        }
-
-        bool IsValidCharacterCodes(List<string> characterCodes)
-        {
-            var originCount = characterCodes.Count;
             if (originCount > 3)
             {
                 _logger.LogWarning("캐릭터코드 3개초과");
@@ -101,7 +45,7 @@ namespace SampleWebApi.Service
             return true;
         }
 
-        bool IsValidMissionCode(List<RequestMission> dbData, string missionCode)
+        public bool IsValidMissionCode(IEnumerable<string> dbMissionCodes, string missionCode)
         {
             if (!_missionProvider.Missions.TryGetValue(missionCode, out var mission))
             {
@@ -109,7 +53,7 @@ namespace SampleWebApi.Service
                 return false;
             }
 
-            if (dbData.Select(m => m.MissionCode).Contains(missionCode))
+            if (dbMissionCodes.Contains(missionCode))
             {
                 _logger.LogWarning("이미 존재하는 의뢰 미션코드,missionCode:{MissionCode}", missionCode);
                 return false;
@@ -118,7 +62,7 @@ namespace SampleWebApi.Service
             return true;
         }
 
-        bool IsMissionSuccess(string missionCode, List<GameCharacter> characters)
+        public bool IsMissionSuccess(string missionCode, List<GameCharacter> characters)
         {
             if (!_missionProvider.Missions.TryGetValue(missionCode, out var mission))
             {
@@ -152,24 +96,38 @@ namespace SampleWebApi.Service
             return true;
         }
 
-        GetMissionRewardEvent ProcessGetRewards(UserInfo userData, MissionReward reward)
+        public List<GetMissionRewardEvent> ProcessCompleteMission(UserInfo userData, string completedMissionCode)
         {
-            switch (reward.ItemCode)
+            List<GetMissionRewardEvent> events = new List<GetMissionRewardEvent>();
+            var rewards = _missionProvider.Missions[completedMissionCode].Rewards;
+
+            foreach (var reward in rewards)
             {
-                case SpeicalItemCodes.Crystal:
-                    int beforeCrystal = userData.Crystal;
-                    userData.Crystal += reward.MinCount;
-                    _logger.LogInformation("User의 크리스탈+{Crystal},적용후+{CrystalCurrent}", reward.MinCount, userData.Crystal);
-                    return new GetMissionRewardEvent()
-                    {
-                        UserId = userData.Id,
-                        ItemCode = reward.ItemCode,
-                        BeforeItemCount = beforeCrystal,
-                        AeforeItemCount = userData.Crystal
-                    };
-                default:
-                    throw new Exception("등록되지않은 아이템 코드");
+                switch (reward.ItemCode)
+                {
+                    case SpeicalItemCodes.Crystal:
+                        int beforeCrystal = userData.Crystal;
+                        userData.Crystal += reward.MinCount;
+                        _logger.LogInformation("User의 크리스탈+{Crystal},적용후+{CrystalCurrent}", reward.MinCount, userData.Crystal);
+                        events.Add(new GetMissionRewardEvent()
+                        {
+                            UserId = userData.Id,
+                            ItemCode = reward.ItemCode,
+                            BeforeItemCount = beforeCrystal,
+                            AeforeItemCount = userData.Crystal
+                        });
+                        break;
+                    default:
+                        throw new Exception("등록되지않은 아이템 코드");
+                }
             }
+
+            return events;
+        }
+
+        public bool IsMissionComplete(RequestMission mission)
+        {
+            return mission.StartTime + TimeSpan.FromSeconds(5) <= DateTime.Now;
         }
     }
 }

@@ -14,18 +14,18 @@ namespace SampleWebApi.Controllers
     {
         IConfiguration _configuration;
         ILogger _logger;
-        UserService _userService;
-        public LoginController(IConfiguration configuration, UserService userService, ILogger<LoginController> logger)
+        UserRepository _repository;
+        public LoginController(IConfiguration configuration, UserRepository userService, ILogger<LoginController> logger)
         {
             this._configuration = configuration;
-            this._userService = userService;
+            this._repository = userService;
             this._logger = logger;
         }
 
         [HttpPost]
         public async Task<RegisterResponse> Register([FromBody] LoginRequest request)
         {
-            if (await _userService.RegisterNewUser(request.Username, request.Password))
+            if (await _repository.RegisterNewUser(request.Username, request.Password))
             {
                 return new RegisterResponse() { IsSuccess = true };
             }
@@ -35,7 +35,7 @@ namespace SampleWebApi.Controllers
         [HttpPost]
         public async Task<LoginResponse> Login([FromBody] LoginRequest request)
         {
-            var checkResult = await _userService.GetUserIdFromUsername(request.Username);
+            var checkResult = await _repository.GetUserIdFromUsername(request.Username);
             if (checkResult.isExist)
             {
                 _logger.LogInformation("유저 로그인성공, username: {Username},userId {UserId}", request.Username, checkResult.userId);

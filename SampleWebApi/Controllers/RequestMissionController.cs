@@ -10,11 +10,11 @@ namespace SampleWebApi.Controllers
     [Route("[controller]/[action]")]
     public class RequestMissionController : ControllerBase
     {
-        RequestMissionService _service;
+        RequestMissionRepository _repository;
         ILogger _logger;
-        public RequestMissionController(RequestMissionService service, ILogger<RequestMissionController> logger)
+        public RequestMissionController(RequestMissionRepository repository, ILogger<RequestMissionController> logger)
         {
-            this._service = service;
+            this._repository = repository;
             _logger = logger;
         }
 
@@ -28,7 +28,7 @@ namespace SampleWebApi.Controllers
                 return BadRequest();
             }
 
-            if (await _service.StartMission(userId, request.MissionCode, request.CharacterCode))
+            if (await _repository.StartMission(userId, request.MissionCode, request.CharacterCode))
             {
                 _logger.LogInformation("미션 시작 성공 userId:{UserId},request:{Request}", userId, JsonSerializer.Serialize(request));
                 return Ok(true);
@@ -50,7 +50,7 @@ namespace SampleWebApi.Controllers
                 return BadRequest();
             }
 
-            await _service.RequestMissionCompleteCheck(userId);
+            await _repository.RequestMissionCompleteCheck(userId);
             _logger.LogInformation("미션 정보 갱신완료 userId:{UserId}", userId);
             return Ok();
         }

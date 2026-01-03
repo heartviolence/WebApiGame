@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 
 namespace SampleWebApi.Service
 {
-    public class GameCharacterDataProvider
+    public class GameCharacterDataProvider : IGameCharacterDataProvider
     {
         public Dictionary<string, GameCharacterData> GameCharacterData { get; private set; }
 

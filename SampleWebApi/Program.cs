@@ -42,11 +42,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<CharacterService>();
+builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<CharacterRepository>();
+builder.Services.AddScoped<RequestMissionRepository>();
 builder.Services.AddScoped<RequestMissionService>();
-builder.Services.AddScoped<RequestMissionProvider>();
-builder.Services.AddScoped<GameCharacterDataProvider>();
+builder.Services.AddScoped<IRequestMissionProvider>((service) => new RequestMissionProvider());
+builder.Services.AddScoped<IGameCharacterDataProvider>((service) => new GameCharacterDataProvider());
 
 var app = builder.Build();
 

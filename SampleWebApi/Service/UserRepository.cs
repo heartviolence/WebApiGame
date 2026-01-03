@@ -4,9 +4,9 @@ using SampleWebApi.Model.Events;
 
 namespace SampleWebApi.Service
 {
-    public class UserService
+    public class UserRepository
     {
-        public UserService()
+        public UserRepository()
         {
         }
 

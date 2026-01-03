@@ -14,11 +14,11 @@ namespace SampleWebApi.Controllers
     [Route("[controller]/[action]")]
     public class CharacterController : ControllerBase
     {
-        CharacterService _characterService;
+        CharacterRepository _repository;
         ILogger _logger;
-        public CharacterController(CharacterService characterService, ILogger<CharacterController> logger)
+        public CharacterController(CharacterRepository repository, ILogger<CharacterController> logger)
         {
-            this._characterService = characterService;
+            this._repository = repository;
             this._logger = logger;
         }
 
@@ -32,7 +32,7 @@ namespace SampleWebApi.Controllers
                 return BadRequest();
             }
 
-            var characters = await _characterService.GetCharacters(userId);
+            var characters = await _repository.GetCharacters(userId);
             _logger.LogInformation("캐릭터 조회 성공 userId:{UserId}", userId);
             return Ok(characters);
 
@@ -71,7 +71,7 @@ namespace SampleWebApi.Controllers
                 return BadRequest();
             }
 
-            await _characterService.Gacha(userId);
+            await _repository.Gacha(userId);
             _logger.LogInformation("캐릭터 추가 성공 userId:{UserId}", userId);
             return Ok();
         }
