@@ -42,8 +42,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddScoped<LoginRepository>();
 builder.Services.AddScoped<UserRepository>();
-builder.Services.AddScoped<CharacterRepository>();
 builder.Services.AddScoped<RequestMissionRepository>();
 builder.Services.AddScoped<RequestMissionService>();
 builder.Services.AddScoped<IRequestMissionProvider>((service) => new RequestMissionProvider());

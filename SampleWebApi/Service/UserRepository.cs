@@ -1,64 +1,106 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SampleWebApi.Model.DbContexts;
 using SampleWebApi.Model.Events;
+using System;
+using System.Runtime.CompilerServices;
 
 namespace SampleWebApi.Service
 {
     public class UserRepository
     {
-        public UserRepository()
+        Random random = new();
+        IGameCharacterDataProvider _gameCharacterData;
+        public UserRepository(IGameCharacterDataProvider gameCharacterData)
         {
+            this._gameCharacterData = gameCharacterData;
         }
 
-        public async Task<(bool isExist, int userId)> GetUserIdFromUsername(string username)
+        public async Task<UserInfo> GetUserInfo(int userId)
         {
             using (var context = new GameDbContext())
             {
-                var user = await context.UserInfos
-                    .Where(u => u.Username == username)
+                return await context.UserInfos
+                    .Where(u => u.Id == userId)
+                    .Include(u => u.Characters)
+                    .Include(u => u.RequestMissions)
+                    .FirstOrDefaultAsync();
+            }
+        }
+
+        public async Task<List<GameCharacter>> GetCharacters(int userId)
+        {
+            using (var context = new GameDbContext())
+            {
+                List<GameCharacter> characters = await context.UserInfos
+                    .Where(u => u.Id == userId)
+                    .Select(u => u.Characters)
                     .FirstOrDefaultAsync();
 
-                if (user != null)
-                {
-                    return (true, user.Id);
-                }
+                return characters;
             }
-            return (false, -1);
         }
 
-        public async Task<bool> RegisterNewUser(string username, string password)
+        public async Task Gacha(int userId)
         {
             using (var context = new GameDbContext())
             {
-                var userExist = await context.UserInfos
-                    .Where(u => u.Username == username)
-                    .CountAsync();
+                var userData = await context.UserInfos
+                    .Include(u => u.Characters)
+                    .FirstOrDefaultAsync(u => u.Id == userId);
 
-                if (userExist > 0)
+                if (userData == null)
                 {
-                    return false;
+                    throw new Exception("User not found");
                 }
 
-                var user = new UserInfo()
+                if (!PayGachaCrystal(userData))
                 {
-                    Username = username,
-                    Password = password
-                };
+                    return;
+                }
+                var characterCodes = userData.Characters.Select(c => c.CharacterID).ToList();
 
-                user.Characters.Add(new GameCharacter() { CharacterID = CharacterId.Sora });
-                var userCreateEvent = Create_UserCreateEvent(username);
-                context.UserInfos.Add(user);
-                context.GameEvents.Add(userCreateEvent.CovertToGameEvent());
+                var gachaEvent = CreateGachaEvent(userId, characterCodes);
+                if (string.IsNullOrEmpty(gachaEvent.AddCharacterCode))
+                {
+                    return;
+                }
+                userData.Characters.Add(new GameCharacter() { CharacterID = gachaEvent.AddCharacterCode });
+                context.GameEvents.Add(gachaEvent.CovertToGameEvent());
                 await context.SaveChangesAsync();
             }
+        }
+
+        bool PayGachaCrystal(UserInfo user)
+        {
+            int gachaPay = 10;
+            if (user.Crystal < gachaPay)
+            {
+                return false;
+            }
+            user.Crystal -= gachaPay;
             return true;
         }
 
-        UserCreateEvent Create_UserCreateEvent(string username)
+        string CharacterGachaOtherOne(IEnumerable<string> characterCodes)
         {
-            return new UserCreateEvent()
+            //가진캐릭의 여집합
+            var complement = _gameCharacterData.GameCharacterData.Select(e => e.Key)
+                                                .Except(characterCodes)
+                                                .ToList();
+            if (complement.Count == 0)
             {
-                Username = username
+                return string.Empty;
+            }
+            var gachaNumber = (int)random.NextInt64(0, complement.Count - 1);
+            return complement[gachaNumber];
+        }
+
+        CharacterGachaEvent CreateGachaEvent(int userId, IEnumerable<string> characterCodes)
+        {
+            return new CharacterGachaEvent()
+            {
+                UserId = userId,
+                AddCharacterCode = CharacterGachaOtherOne(characterCodes)
             };
         }
     }

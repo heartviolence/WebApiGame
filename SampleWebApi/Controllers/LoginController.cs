@@ -14,8 +14,8 @@ namespace SampleWebApi.Controllers
     {
         IConfiguration _configuration;
         ILogger _logger;
-        UserRepository _repository;
-        public LoginController(IConfiguration configuration, UserRepository userService, ILogger<LoginController> logger)
+        LoginRepository _repository;
+        public LoginController(IConfiguration configuration, LoginRepository userService, ILogger<LoginController> logger)
         {
             this._configuration = configuration;
             this._repository = userService;

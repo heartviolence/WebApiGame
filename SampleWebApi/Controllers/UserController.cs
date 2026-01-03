@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Assets.Scripts.Shared;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SampleWebApi.Model;
@@ -12,11 +13,11 @@ namespace SampleWebApi.Controllers
 
     [ApiController]
     [Route("[controller]/[action]")]
-    public class CharacterController : ControllerBase
+    public class UserController : ControllerBase
     {
-        CharacterRepository _repository;
+        UserRepository _repository;
         ILogger _logger;
-        public CharacterController(CharacterRepository repository, ILogger<CharacterController> logger)
+        public UserController(UserRepository repository, ILogger<UserController> logger)
         {
             this._repository = repository;
             this._logger = logger;
@@ -24,7 +25,7 @@ namespace SampleWebApi.Controllers
 
         [Authorize]
         [HttpGet]
-        public async Task<ActionResult<List<GameCharacter>>> GetCharacters()
+        public async Task<ActionResult<List<GameCharacterDTO>>> GetCharacters()
         {
             if (!int.TryParse(User.FindFirst("userId")?.Value, out var userId))
             {
@@ -34,9 +35,25 @@ namespace SampleWebApi.Controllers
 
             var characters = await _repository.GetCharacters(userId);
             _logger.LogInformation("캐릭터 조회 성공 userId:{UserId}", userId);
-            return Ok(characters);
+            return Ok(characters.ConvertAll(x => x.DTO()));
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<ActionResult<UserInfoDTO>> GetUserInfo()
+        {
+            if (!int.TryParse(User.FindFirst("userId")?.Value, out var userId))
+            {
+                _logger.LogInformation("토큰에서 UserId를 찾지못함");
+                return BadRequest();
+            }
+
+            var userInfo = await _repository.GetUserInfo(userId);
+            _logger.LogInformation("유저데이터 조회 성공 userId:{UserId}", userId);
+            return Ok(userInfo.DTO());
 
         }
+
 
         [Authorize]
         [HttpDelete]

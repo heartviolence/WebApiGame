@@ -1,6 +1,5 @@
 public class GameCharacterDTO
 {
-    public int Id { get; set; }
     public string CharacterID { get; set; }
 
     public int Level { get; set; } = 1;

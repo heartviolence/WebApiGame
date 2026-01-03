@@ -1,3 +1,4 @@
+using Assets.Scripts;
 using Assets.Scripts.Shared;
 using System;
 using System.Collections.Generic;
@@ -6,209 +7,95 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 using UnityEngine.UI;
 
 public class SandBox : MonoBehaviour
 {
     HttpClient _client;
-    LoginResponse _loginResult;
 
     public Button GachaButton;
     public Button CharacterDeleteButton;
     public Button RequestMissionStartButton;
     public Button RequestMissionCompleteButton;
+    public Button UserInfoButton;
+    public TMP_Text CrystalText;
 
-    List<GameCharacterDTO> _characters = new();
+    LoginService _loginService = new();
+    UserService _userService = new();
+    RequestMissionService _requestMissionService = new();
+
+    UserInfoDTO _userInfo;
+
     void Start()
     {
         _client = new HttpClient();
         _client.BaseAddress = new System.Uri("https://localhost:7067/");
         _client.Timeout = TimeSpan.FromSeconds(5);
+        GameApiClient.Client = _client;
 
-        GachaButton.onClick.AddListener(() => GachaTest());
+        GachaButton.onClick.AddListener(() => Gacha());
         CharacterDeleteButton.onClick.AddListener(() => DeleteAll());
         RequestMissionStartButton.onClick.AddListener(() => RequestMissionStart());
         RequestMissionCompleteButton.onClick.AddListener(() => RequestMissionCompleteCheck());
-        LoginCall();
+        UserInfoButton.onClick.AddListener(() => UserInfo());
+        Login();
     }
 
-    async Task LoginCall()
+    async Task Login()
     {
-        Debug.Log("Starting Login Call...");
-        await RegisterCallTest();
-
-        var loginRequest = new LoginRequest()
-        {
-            Username = "admin",
-            Password = "password"
-        };
-        try
-        {
-            var loginResponse = await _client.PostAsJsonAsync($"Login/Login", loginRequest);
-            loginResponse.EnsureSuccessStatusCode();
-            var loginResponseContent = await loginResponse.Content.ReadFromJsonAsync<LoginResponse>();
-            _loginResult = loginResponseContent;
-            Debug.Log($"Login Success: {loginResponseContent.IsSuccess}, Token: {loginResponseContent.Token}");
-            await LoginTestCall2(loginResponseContent.Token);
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Login Call Failed: {ex.Message}");
-        }
+        await _loginService.Register("admin", "password");
+        await _loginService.Login("admin", "password");
+        Debug.Log("로그인 완료");
+        await UserInfo();
+        Show();
     }
 
-    async Task LoginTestCall(string token)
+    async Task Gacha()
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, "Login/LoginTest");
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-        try
-        {
-            HttpResponseMessage response = await _client.SendAsync(request);
-            response.EnsureSuccessStatusCode();
-            Debug.Log($"Login Test Call Success");
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Login Test Call Failed: {ex.Message}");
-        }
-    }
-
-    async Task LoginTestCall2(string token)
-    {
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        try
-        {
-            HttpResponseMessage response = await _client.GetAsync("Login/LoginTest");
-            response.EnsureSuccessStatusCode();
-            Debug.Log($"Login Test Call 2 Success");
-            await CharacterCallTest();
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Login Test Call 2 Failed: {ex.Message}");
-        }
-    }
-
-    async Task CharacterCallTest()
-    {
-        try
-        {
-            HttpResponseMessage response = await _client.GetAsync($"Character/GetCharacters");
-            response.EnsureSuccessStatusCode();
-            Debug.Log($"CharacterCallTestSuccess");
-            if (response.Content.Headers.ContentLength > 0)
-            {
-                _characters = await response.Content.ReadFromJsonAsync<List<GameCharacterDTO>>();
-                Debug.Log("Character Info---------------------------");
-                foreach (var character in _characters)
-                {
-                    Debug.Log($"Character ID: {character.CharacterID}, Level: {character.Level}, EXP: {character.EXP}");
-                }
-                Debug.Log("---------------------------");
-            }
-            else
-            {
-                Debug.Log($"Chracters is null");
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"CharacterCallTestFailed : {ex.Message}");
-        }
-    }
-
-    async Task RegisterCallTest()
-    {
-        Debug.Log("Starting Register Call...");
-        var loginRequest = new LoginRequest()
-        {
-            Username = "admin",
-            Password = "password"
-        };
-        try
-        {
-            HttpResponseMessage response = await _client.PostAsJsonAsync("Login/Register", loginRequest);
-            response.EnsureSuccessStatusCode();
-            var result = await response.Content.ReadFromJsonAsync<RegisterResponse>();
-            if (result.IsSuccess)
-            {
-                Debug.Log("Register Call Success");
-            }
-            else
-            {
-                Debug.Log($"Register Call Failed,message:{result.Message}");
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Register Call Failed: {ex.Message}");
-            throw;
-        }
-    }
-
-    async Task GachaTest()
-    {
-        Debug.Log("Starting Gacha Call...");
-        try
-        {
-            HttpResponseMessage response = await _client.PostAsync($"Character/Gacha", new StringContent(""));
-            response.EnsureSuccessStatusCode();
-            await CharacterCallTest();
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Gacha Call Failed: {ex.Message}");
-        }
+        await _userService.Gacha();
+        _userInfo.Characters = await _userService.GetCharacters();
+        await UserInfo();
+        Show();
     }
 
     async Task DeleteAll()
     {
-        Debug.Log("Starting DeleteAll Test");
-        try
-        {
-            HttpResponseMessage response = await _client.DeleteAsync($"Character/DeleteAll");
-            response.EnsureSuccessStatusCode();
-            await CharacterCallTest();
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"DeleteAll Call Failed: {ex.Message}");
-        }
+        await _userService.DeleteAll();
+        _userInfo.Characters = await _userService.GetCharacters();
+        Show();
+    }
+
+    async Task UserInfo()
+    {
+        _userInfo = await _userService.GetUserInfo();
+        Debug.Log("유저정보 갱신완료");
+        CrystalText.text = _userInfo.Crystal.ToString();
     }
 
     async Task RequestMissionStart()
     {
-        Debug.Log("Starting RequestMissionStart Call...");
-        try
-        {
-            var requestBody = new RequestMissionStartRequest()
-            {
-                MissionCode = "00-00-01",
-                CharacterCode = new() { "00_01", "00_04" }
-            };
-            HttpResponseMessage response = await _client.PostAsJsonAsync($"RequestMission/StartMission", requestBody);
-            response.EnsureSuccessStatusCode();
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"RequestMissionStart Call Failed: {ex.Message}");
-        }
+        await _requestMissionService.RequestMissionStart();
+        Debug.Log("미션 시작");
+        await UserInfo();
     }
-
 
     async Task RequestMissionCompleteCheck()
     {
-        Debug.Log("Starting RequestMissionCompleteCheck Call...");
-        try
-        {
-            HttpResponseMessage response = await _client.PutAsync($"RequestMission/RequestMissionCompleteCheck", new StringContent(""));
-            response.EnsureSuccessStatusCode();
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"RequestMissionCompleteCheck Call Failed: {ex.Message}");
-        }
+        await _requestMissionService.RequestMissionCompleteCheck();
+        Debug.Log("미션 업데이트완료");
+        await UserInfo();
     }
+    void Show()
+    {
+        Debug.Log("캐릭터 정보목록---------------------------");
+        foreach (var character in _userInfo.Characters)
+        {
+            Debug.Log($"Character ID: {character.CharacterID}, Level: {character.Level}, EXP: {character.EXP}");
+        }
+        Debug.Log("---------------------------");
+    }
+
 }
