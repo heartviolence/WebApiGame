@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SampleWebApi.Model.Characters;
-using SampleWebApi.Model.DbContexts;
-using SampleWebApi.Model.Events;
 using SampleWebApi.Model.Items;
 using SampleWebApi.Model.RequestMissions;
+using ServerShared.DbContexts;
+using ServerShared.Events;
 
 namespace SampleWebApi.Service
 {

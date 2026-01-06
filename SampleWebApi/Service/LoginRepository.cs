@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SampleWebApi.Model.DbContexts;
-using SampleWebApi.Model.Events;
+﻿using Microsoft.EntityFrameworkCore; 
+using ServerShared.DbContexts;
+using ServerShared.Events;
 
 namespace SampleWebApi.Service
 {
@@ -45,7 +45,10 @@ namespace SampleWebApi.Service
                     Password = password
                 };
 
-                user.Characters.Add(new GameCharacter() { CharacterID = CharacterId.Sora });
+                user.Characters.Add(DefaultGameCharacter.Sora());
+                user.Characters.Add(DefaultGameCharacter.Sia());
+                user.Characters.Add(DefaultGameCharacter.Nora());
+                user.Characters.Add(DefaultGameCharacter.Flora());
                 var userCreateEvent = Create_UserCreateEvent(username);
                 context.UserInfos.Add(user);
                 context.GameEvents.Add(userCreateEvent.CovertToGameEvent());

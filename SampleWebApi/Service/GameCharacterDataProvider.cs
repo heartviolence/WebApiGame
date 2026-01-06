@@ -1,5 +1,5 @@
 ﻿using SampleWebApi.Model.Characters;
-using SampleWebApi.Model.DbContexts;
+using ServerShared.DbContexts;
 using System.Collections.ObjectModel;
 
 namespace SampleWebApi.Service

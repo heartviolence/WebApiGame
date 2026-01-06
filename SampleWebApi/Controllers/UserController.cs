@@ -2,11 +2,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SampleWebApi.Model;
-using SampleWebApi.Model.DbContexts;
+using SampleWebApi.Model; 
 using SampleWebApi.Service;
-using System.Linq;
-using System.Security.Claims;
+using ServerShared.DbContexts; 
 
 namespace SampleWebApi.Controllers
 {

@@ -1,5 +1,5 @@
 ﻿using Assets.Scripts.Shared;
-using SampleWebApi.Model.DbContexts;
+using ServerShared.DbContexts;
 
 namespace SampleWebApi.Model
 {

@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging.Abstractions;
-using SampleWebApi.Model.DbContexts;
-using SampleWebApi.Model.Events;
 using SampleWebApi.Model.Items;
 using SampleWebApi.Service;
+using ServerShared.DbContexts;
+using ServerShared.Events;
 using System.Collections;
 
 namespace ServerTest

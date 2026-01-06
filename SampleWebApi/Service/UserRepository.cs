@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SampleWebApi.Model.DbContexts;
-using SampleWebApi.Model.Events;
+using ServerShared.DbContexts;
+using ServerShared.Events;
 using System;
 using System.Runtime.CompilerServices;
 
@@ -64,7 +64,7 @@ namespace SampleWebApi.Service
                 {
                     return;
                 }
-                userData.Characters.Add(new GameCharacter() { CharacterID = gachaEvent.AddCharacterCode });
+                userData.Characters.Add(DefaultGameCharacter.Create(gachaEvent.AddCharacterCode));
                 context.GameEvents.Add(gachaEvent.CovertToGameEvent());
                 await context.SaveChangesAsync();
             }
