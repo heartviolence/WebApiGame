@@ -1,5 +1,5 @@
-﻿using SampleWebApi.Model.Characters;
-using ServerShared.DbContexts;
+﻿using Assets.Scripts.Shared.GameDatas;
+using SampleWebApi.Model.Characters;
 using System.Collections.ObjectModel;
 
 namespace SampleWebApi.Service
@@ -16,27 +16,27 @@ namespace SampleWebApi.Service
 
         void Initialize()
         {
-            GameCharacterData.Add(CharacterId.Sora, new GameCharacterData()
+            GameCharacterData.Add(CharacterNames.Sora, new GameCharacterData()
             {
-                characterCode = CharacterId.Sora,
+                characterCode = CharacterNames.Sora,
                 Type = GameCharacterType.Dealer,
             });
 
-            GameCharacterData.Add(CharacterId.Sia, new GameCharacterData()
+            GameCharacterData.Add(CharacterNames.Sia, new GameCharacterData()
             {
-                characterCode = CharacterId.Sia,
+                characterCode = CharacterNames.Sia,
                 Type = GameCharacterType.Support,
             });
 
-            GameCharacterData.Add(CharacterId.Nora, new GameCharacterData()
+            GameCharacterData.Add(CharacterNames.Nora, new GameCharacterData()
             {
-                characterCode = CharacterId.Nora,
+                characterCode = CharacterNames.Nora,
                 Type = GameCharacterType.Balance,
             });
 
-            GameCharacterData.Add(CharacterId.Flora, new GameCharacterData()
+            GameCharacterData.Add(CharacterNames.Flora, new GameCharacterData()
             {
-                characterCode = CharacterId.Flora,
+                characterCode = CharacterNames.Flora,
                 Type = GameCharacterType.Dealer,
             });
         }

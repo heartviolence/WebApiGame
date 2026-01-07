@@ -14,5 +14,8 @@ namespace Assets.Scripts.Shared
         public int Crystal { get; set; }
 
         public List<RequestMissionDTO> RequestMissions { get; set; } = new();
+
+        public List<GameItemDTO> GameItems { get; set; } = new();
+        public List<RecordItemDTO> Records { get; set; } = new();
     }
 }

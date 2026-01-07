@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging.Abstractions;
+﻿using Assets.Scripts.Shared.GameDatas;
+using Microsoft.Extensions.Logging.Abstractions;
 using SampleWebApi.Model.Items;
 using SampleWebApi.Service;
 using ServerShared.DbContexts;
@@ -25,14 +26,14 @@ namespace ServerTest
         {
             get
             {
-                yield return new TestCaseData(new List<string> { CharacterId.Sora, CharacterId.Sia, CharacterId.Flora }).Returns(true);
-                yield return new TestCaseData(new List<string> { CharacterId.Sora, CharacterId.Flora }).Returns(true);
-                yield return new TestCaseData(new List<string> { CharacterId.Sora, CharacterId.Sia }).Returns(true);
+                yield return new TestCaseData(new List<string> { CharacterNames.Sora, CharacterNames.Sia, CharacterNames.Flora }).Returns(true);
+                yield return new TestCaseData(new List<string> { CharacterNames.Sora, CharacterNames.Flora }).Returns(true);
+                yield return new TestCaseData(new List<string> { CharacterNames.Sora, CharacterNames.Sia }).Returns(true);
                 yield return new TestCaseData(new List<string>()).Returns(false);
-                yield return new TestCaseData(new List<string> { CharacterId.Sia, CharacterId.Flora, CharacterId.Sia }).Returns(false);
-                yield return new TestCaseData(new List<string> { CharacterId.Flora, CharacterId.Flora }).Returns(false);
-                yield return new TestCaseData(new List<string> { CharacterId.Sora, CharacterId.Sia, CharacterId.Nora, CharacterId.Flora }).Returns(false);
-                yield return new TestCaseData(new List<string> { CharacterId.Sora, CharacterId.Sia, CharacterId.Flora, CharacterId.Flora }).Returns(false);
+                yield return new TestCaseData(new List<string> { CharacterNames.Sia, CharacterNames.Flora, CharacterNames.Sia }).Returns(false);
+                yield return new TestCaseData(new List<string> { CharacterNames.Flora, CharacterNames.Flora }).Returns(false);
+                yield return new TestCaseData(new List<string> { CharacterNames.Sora, CharacterNames.Sia, CharacterNames.Nora, CharacterNames.Flora }).Returns(false);
+                yield return new TestCaseData(new List<string> { CharacterNames.Sora, CharacterNames.Sia, CharacterNames.Flora, CharacterNames.Flora }).Returns(false);
             }
         }
 
@@ -79,7 +80,7 @@ namespace ServerTest
 
             Assert.That(userInfo.Crystal == 100);
             Assert.That(createdEvents.Count == 1);
-            Assert.That(createdEvents[0].ItemCode == SpeicalItemCodes.Crystal);
+            Assert.That(createdEvents[0].ItemCode == SpeicalItemNames.Crystal);
             Assert.That(createdEvents[0].BeforeItemCount == 0);
             Assert.That(createdEvents[0].AeforeItemCount == 100);
         }

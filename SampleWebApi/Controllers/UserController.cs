@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SampleWebApi.Model; 
+using SampleWebApi.Model;
 using SampleWebApi.Service;
-using ServerShared.DbContexts; 
+using ServerShared.DbContexts;
 
 namespace SampleWebApi.Controllers
 {
@@ -89,6 +89,7 @@ namespace SampleWebApi.Controllers
             await _repository.Gacha(userId);
             _logger.LogInformation("캐릭터 추가 성공 userId:{UserId}", userId);
             return Ok();
-        }
+        }        
+
     }
 }

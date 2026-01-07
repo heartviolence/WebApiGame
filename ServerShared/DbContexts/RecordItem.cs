@@ -4,13 +4,11 @@ using System.Text;
 
 namespace ServerShared.DbContexts
 {
-    public class CompletedAchievement
+    public class RecordItem
     {
         public int Id { get; set; }
-        public string AchievementCode { get; set; }
+        public string Name { get; set; }
 
-        public int Level { get; set; }
-
-
+        public int StarLevel { get; set; } = 0;
     }
 }

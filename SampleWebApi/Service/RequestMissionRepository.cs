@@ -36,7 +36,7 @@ namespace SampleWebApi.Service
                     return false;
                 }
 
-                var characters = user.Characters.Where(c => characterCodes.Contains(c.CharacterID)).ToList();
+                var characters = user.Characters.Where(c => characterCodes.Contains(c.Name)).ToList();
                 if (characters.Count != characterCodes.Count)
                 {
                     _logger.LogWarning("요청 캐릭터 코드에 해당하는 캐릭터가 존재하지않음");

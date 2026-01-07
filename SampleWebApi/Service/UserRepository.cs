@@ -23,6 +23,8 @@ namespace SampleWebApi.Service
                     .Where(u => u.Id == userId)
                     .Include(u => u.Characters)
                     .Include(u => u.RequestMissions)
+                    .Include(u => u.GameItems)
+                    .Include(u => u.Records)
                     .FirstOrDefaultAsync();
             }
         }
@@ -57,7 +59,7 @@ namespace SampleWebApi.Service
                 {
                     return;
                 }
-                var characterCodes = userData.Characters.Select(c => c.CharacterID).ToList();
+                var characterCodes = userData.Characters.Select(c => c.Name).ToList();
 
                 var gachaEvent = CreateGachaEvent(userId, characterCodes);
                 if (string.IsNullOrEmpty(gachaEvent.AddCharacterCode))

@@ -80,7 +80,7 @@ namespace SampleWebApi.Service
 
             foreach (var character in characters)
             {
-                var characterType = gameCharacterData[character.CharacterID].Type;
+                var characterType = gameCharacterData[character.Name].Type;
                 typeCounts[(int)characterType] = typeCounts[(int)characterType] + 1;
             }
 
@@ -105,7 +105,7 @@ namespace SampleWebApi.Service
             {
                 switch (reward.ItemCode)
                 {
-                    case SpeicalItemCodes.Crystal:
+                    case SpeicalItemNames.Crystal:
                         int beforeCrystal = userData.Crystal;
                         userData.Crystal += reward.MinCount;
                         _logger.LogInformation("User의 크리스탈+{Crystal},적용후+{CrystalCurrent}", reward.MinCount, userData.Crystal);

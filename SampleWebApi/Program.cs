@@ -46,6 +46,9 @@ builder.Services.AddScoped<LoginRepository>();
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<RequestMissionRepository>();
 builder.Services.AddScoped<RequestMissionService>();
+builder.Services.AddScoped<CharacterRepository>();
+builder.Services.AddScoped<CharacterService>();
+builder.Services.AddScoped<GameItemService>();
 builder.Services.AddScoped<IRequestMissionProvider>((service) => new RequestMissionProvider());
 builder.Services.AddScoped<IGameCharacterDataProvider>((service) => new GameCharacterDataProvider());
 

@@ -28,5 +28,10 @@ namespace ServerShared.DbContexts
         public List<CompletedAchievement> CompletedAchievements { get; set; } = new();
 
         public AchievementsData AchievementData { get; set; } = new();
+
+        public List<GameItem> GameItems { get; set; } = new();
+
+        public List<RecordItem> Records { get; set; } = new();
+
     }
 }

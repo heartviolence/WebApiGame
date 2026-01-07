@@ -1,6 +1,6 @@
 public class GameCharacterDTO
 {
-    public string CharacterID { get; set; }
+    public string Name { get; set; }
 
     public int Level { get; set; } = 1;
     public int EXP { get; set; } = 0;
@@ -9,4 +9,5 @@ public class GameCharacterDTO
     public int B_Skill_Level { get; set; } = 1;
 
     public int StarLevel { get; set; } = 0;
+    public int Rank { get; set; } = 0;
 }

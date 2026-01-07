@@ -1,6 +1,6 @@
 ﻿namespace SampleWebApi.Model.Items
 {
-    public class SpeicalItemCodes
+    public class SpeicalItemNames
     {
         public const string Crystal = "Crystal";
     }

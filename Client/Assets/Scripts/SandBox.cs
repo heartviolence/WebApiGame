@@ -1,5 +1,6 @@
 using Assets.Scripts;
 using Assets.Scripts.Shared;
+using Assets.Scripts.Shared.GameDatas;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,11 +22,18 @@ public class SandBox : MonoBehaviour
     public Button RequestMissionStartButton;
     public Button RequestMissionCompleteButton;
     public Button UserInfoButton;
+    public Button LevelUpButton;
+    public Button RankUpButton;
+    public Button ShowMetheMoneyButton;
     public TMP_Text CrystalText;
+    public TMP_Text RankUpText;
+    public TMP_Text LevelUpText;
 
     LoginService _loginService = new();
     UserService _userService = new();
     RequestMissionService _requestMissionService = new();
+    CharacterService _characterService = new();
+    ServerSandBoxService _serverSandBoxService = new();
 
     UserInfoDTO _userInfo;
 
@@ -41,6 +49,9 @@ public class SandBox : MonoBehaviour
         RequestMissionStartButton.onClick.AddListener(() => RequestMissionStart());
         RequestMissionCompleteButton.onClick.AddListener(() => RequestMissionCompleteCheck());
         UserInfoButton.onClick.AddListener(() => UserInfo());
+        LevelUpButton.onClick.AddListener(() => LevelUp());
+        RankUpButton.onClick.AddListener(() => RankUp());
+        ShowMetheMoneyButton.onClick.AddListener(() => ShowMetheMoney());
         Login();
     }
 
@@ -72,7 +83,12 @@ public class SandBox : MonoBehaviour
     {
         _userInfo = await _userService.GetUserInfo();
         Debug.Log("유저정보 갱신완료");
+        Show();
         CrystalText.text = _userInfo.Crystal.ToString();
+        var rankupItem = _userInfo.GameItems.Where(e => e.Name == ItemNames.CharacterRankUpMaterial).FirstOrDefault();
+        RankUpText.text = rankupItem?.Count.ToString() ?? "0";
+        var levelupItem = _userInfo.GameItems.Where(e => e.Name == ItemNames.CharacterLevelUpMaterial).FirstOrDefault();
+        LevelUpText.text = levelupItem?.Count.ToString() ?? "0";
     }
 
     async Task RequestMissionStart()
@@ -88,12 +104,29 @@ public class SandBox : MonoBehaviour
         Debug.Log("미션 업데이트완료");
         await UserInfo();
     }
+
+    async Task ShowMetheMoney()
+    {
+        await _serverSandBoxService.ShowMetheMoney();
+        await UserInfo();
+    }
+
+    async Task LevelUp()
+    {
+        await _characterService.UseLevelUpItem(CharacterNames.Sora, 1);
+        await UserInfo();
+    }
+    async Task RankUp()
+    {
+        await _characterService.RankUp(CharacterNames.Sora);
+        await UserInfo();
+    }
     void Show()
     {
         Debug.Log("캐릭터 정보목록---------------------------");
         foreach (var character in _userInfo.Characters)
         {
-            Debug.Log($"Character ID: {character.CharacterID}, Level: {character.Level}, EXP: {character.EXP}");
+            Debug.Log($"Character Name: {character.Name}, Level: {character.Level}, EXP: {character.EXP},Rank: {character.Rank}");
         }
         Debug.Log("---------------------------");
     }
