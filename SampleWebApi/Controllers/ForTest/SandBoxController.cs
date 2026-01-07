@@ -1,11 +1,9 @@
-﻿using Assets.Scripts.Shared;
-using Assets.Scripts.Shared.GameDatas;
+﻿using Assets.Scripts.Shared.GameDatas;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SampleWebApi.Model;
 using SampleWebApi.Model.Items;
-using SampleWebApi.Service;
+using SampleWebApi.Service.Users.Items;
 using ServerShared.DbContexts;
 
 namespace SampleWebApi.Controllers.ForTest

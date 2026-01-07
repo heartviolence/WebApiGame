@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ServerShared.DbContexts;
-using System.Threading.Tasks;
 
-namespace SampleWebApi.Service
+namespace SampleWebApi.Service.Characters
 {
     public class CharacterRepository
     {

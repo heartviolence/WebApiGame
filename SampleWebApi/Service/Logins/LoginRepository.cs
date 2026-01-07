@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore; 
+﻿using Microsoft.EntityFrameworkCore;
+using SampleWebApi.Model.Characters;
 using ServerShared.DbContexts;
 using ServerShared.Events;
 
-namespace SampleWebApi.Service
+namespace SampleWebApi.Service.Logins
 {
     public class LoginRepository
     {

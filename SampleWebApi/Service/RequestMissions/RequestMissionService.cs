@@ -1,11 +1,10 @@
 ﻿using SampleWebApi.Model.Characters;
-using SampleWebApi.Model.Items;
-using SampleWebApi.Model.RequestMissions;
+using SampleWebApi.Model.Items; 
+using SampleWebApi.Service.Characters;
 using ServerShared.DbContexts;
-using ServerShared.Events;
-using System.Reflection;
+using ServerShared.Events; 
 
-namespace SampleWebApi.Service
+namespace SampleWebApi.Service.RequestMissions
 {
     public class RequestMissionService
     {

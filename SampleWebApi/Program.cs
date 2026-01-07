@@ -2,7 +2,11 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
-using SampleWebApi.Service;
+using SampleWebApi.Service.Characters;
+using SampleWebApi.Service.Logins;
+using SampleWebApi.Service.RequestMissions;
+using SampleWebApi.Service.Users;
+using SampleWebApi.Service.Users.Items;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);

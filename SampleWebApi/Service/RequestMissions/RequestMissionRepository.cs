@@ -1,11 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SampleWebApi.Model.Characters;
-using SampleWebApi.Model.Items;
-using SampleWebApi.Model.RequestMissions;
 using ServerShared.DbContexts;
 using ServerShared.Events;
 
-namespace SampleWebApi.Service
+namespace SampleWebApi.Service.RequestMissions
 {
     public class RequestMissionRepository
     {

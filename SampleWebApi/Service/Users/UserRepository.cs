@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SampleWebApi.Model.Characters;
+using SampleWebApi.Service.Characters;
 using ServerShared.DbContexts;
-using ServerShared.Events;
-using System;
-using System.Runtime.CompilerServices;
+using ServerShared.Events; 
 
-namespace SampleWebApi.Service
+namespace SampleWebApi.Service.Users
 {
     public class UserRepository
     {

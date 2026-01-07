@@ -1,7 +1,7 @@
 ﻿using Assets.Scripts.Shared.GameDatas;
 using ServerShared.DbContexts;
 
-namespace SampleWebApi.Service
+namespace SampleWebApi.Service.Characters
 {
     public class CharacterService
     {

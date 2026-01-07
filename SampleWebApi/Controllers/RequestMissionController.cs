@@ -1,7 +1,7 @@
 ﻿using Assets.Scripts.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SampleWebApi.Service;
+using SampleWebApi.Service.RequestMissions;
 using System.Text.Json;
 
 namespace SampleWebApi.Controllers

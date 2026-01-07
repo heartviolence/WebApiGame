@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using SampleWebApi.Service;
+using SampleWebApi.Service.Logins;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 

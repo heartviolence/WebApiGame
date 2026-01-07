@@ -1,7 +1,7 @@
 ﻿using Assets.Scripts.Shared.GameDatas;
 using ServerShared.DbContexts;
 
-namespace SampleWebApi.Service
+namespace SampleWebApi.Model.Characters
 {
     public static class DefaultGameCharacter
     {

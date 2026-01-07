@@ -1,8 +1,7 @@
 ﻿using Assets.Scripts.Shared.GameDatas;
-using SampleWebApi.Model.Characters;
-using System.Collections.ObjectModel;
+using SampleWebApi.Model.Characters; 
 
-namespace SampleWebApi.Service
+namespace SampleWebApi.Service.Characters
 {
     public class GameCharacterDataProvider : IGameCharacterDataProvider
     {

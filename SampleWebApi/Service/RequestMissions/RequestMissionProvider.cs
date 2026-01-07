@@ -1,7 +1,7 @@
 ﻿using SampleWebApi.Model.Characters;
 using SampleWebApi.Model.RequestMissions;
 
-namespace SampleWebApi.Service
+namespace SampleWebApi.Service.RequestMissions
 {
     public class RequestMissionProvider : IRequestMissionProvider
     {

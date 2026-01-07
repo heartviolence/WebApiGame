@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SampleWebApi.Model;
-using SampleWebApi.Service;
+using SampleWebApi.Service.Characters;
 
 namespace SampleWebApi.Controllers
 {

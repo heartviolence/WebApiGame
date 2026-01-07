@@ -1,6 +1,6 @@
 ﻿using SampleWebApi.Model.Characters;
 
-namespace SampleWebApi.Service
+namespace SampleWebApi.Service.Characters
 {
     public interface IGameCharacterDataProvider
     {

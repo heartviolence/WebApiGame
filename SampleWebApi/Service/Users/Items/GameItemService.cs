@@ -1,9 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SampleWebApi.Model.Items;
-using ServerShared.DbContexts;
-using ServerShared.Events;
+﻿using SampleWebApi.Model.Items;
+using ServerShared.DbContexts; 
 
-namespace SampleWebApi.Service
+namespace SampleWebApi.Service.Users.Items
 {
     public class GameItemService
     {
