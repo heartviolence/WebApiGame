@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+using SampleWebApi.Service.Achievements;
 using SampleWebApi.Service.Characters;
 using SampleWebApi.Service.Logins;
 using SampleWebApi.Service.RequestMissions;
@@ -53,6 +54,8 @@ builder.Services.AddScoped<RequestMissionService>();
 builder.Services.AddScoped<CharacterRepository>();
 builder.Services.AddScoped<CharacterService>();
 builder.Services.AddScoped<GameItemService>();
+builder.Services.AddScoped<AchievementService>();
+builder.Services.AddScoped<AchievementRepository>();
 builder.Services.AddScoped<IRequestMissionProvider>((service) => new RequestMissionProvider());
 builder.Services.AddScoped<IGameCharacterDataProvider>((service) => new GameCharacterDataProvider());
 

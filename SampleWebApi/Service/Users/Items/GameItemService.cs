@@ -25,7 +25,7 @@ namespace SampleWebApi.Service.Users.Items
             item.Count += count;
         }
 
-        public bool ProcessSpecialItem(UserInfo user, string itemName, int count)
+        bool ProcessSpecialItem(UserInfo user, string itemName, int count)
         {
             switch (itemName)
             {

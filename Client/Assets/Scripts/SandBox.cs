@@ -25,6 +25,7 @@ public class SandBox : MonoBehaviour
     public Button LevelUpButton;
     public Button RankUpButton;
     public Button ShowMetheMoneyButton;
+    public Button GainAchievementRewardButton;
     public TMP_Text CrystalText;
     public TMP_Text RankUpText;
     public TMP_Text LevelUpText;
@@ -34,6 +35,7 @@ public class SandBox : MonoBehaviour
     RequestMissionService _requestMissionService = new();
     CharacterService _characterService = new();
     ServerSandBoxService _serverSandBoxService = new();
+    AchievementService _achievementService = new();
 
     UserInfoDTO _userInfo;
 
@@ -52,6 +54,7 @@ public class SandBox : MonoBehaviour
         LevelUpButton.onClick.AddListener(() => LevelUp());
         RankUpButton.onClick.AddListener(() => RankUp());
         ShowMetheMoneyButton.onClick.AddListener(() => ShowMetheMoney());
+        GainAchievementRewardButton.onClick.AddListener(() => GainAchievementRewards());
         Login();
     }
 
@@ -120,6 +123,12 @@ public class SandBox : MonoBehaviour
     {
         await _characterService.RankUp(CharacterNames.Sora);
         await UserInfo();
+    }
+
+    async Task GainAchievementRewards()
+    {
+        await _achievementService.GainAchievementRewards("GachaGameAchievement");
+        await UserInfo(); 
     }
     void Show()
     {

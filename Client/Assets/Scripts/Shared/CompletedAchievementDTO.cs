@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ServerShared.DbContexts
+namespace Assets.Scripts.Shared
 {
-    public class CompletedAchievement
+    public class CompletedAchievementDTO
     {
-        public int Id { get; set; }
-        public string AchievementName { get; set; }
+        public string AchievementCode { get; set; }
 
         public int Level { get; set; }
 

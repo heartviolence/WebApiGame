@@ -2,7 +2,7 @@
 using SampleWebApi.Model.Characters;
 using SampleWebApi.Service.Characters;
 using ServerShared.DbContexts;
-using ServerShared.Events; 
+using ServerShared.Events;
 
 namespace SampleWebApi.Service.Users
 {
@@ -25,6 +25,7 @@ namespace SampleWebApi.Service.Users
                     .Include(u => u.RequestMissions)
                     .Include(u => u.GameItems)
                     .Include(u => u.Records)
+                    .Include(u => u.CompletedAchievements)
                     .FirstOrDefaultAsync();
             }
         }

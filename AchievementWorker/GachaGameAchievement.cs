@@ -26,12 +26,12 @@ namespace AchievementWorker
 
         public void Check(UserInfo user)
         {
-            var thisAchievement = user.CompletedAchievements.Where(e => e.AchievementCode == nameof(GachaGameAchievement)).SingleOrDefault();
+            var thisAchievement = user.CompletedAchievements.Where(e => e.AchievementName == nameof(GachaGameAchievement)).SingleOrDefault();
             if (thisAchievement == null)
             {
                 thisAchievement = new CompletedAchievement()
                 {
-                    AchievementCode = nameof(GachaGameAchievement),
+                    AchievementName = nameof(GachaGameAchievement),
                     Level = 0
                 };
                 user.CompletedAchievements.Add(thisAchievement);
