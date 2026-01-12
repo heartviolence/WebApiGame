@@ -9,7 +9,7 @@ using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
 
-namespace Assets.Scripts
+namespace Assets.Scripts.Services
 {
     internal class UserService
     {

@@ -9,7 +9,7 @@ using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEditor.PackageManager;
 using UnityEngine;
 
-namespace Assets.Scripts
+namespace Assets.Scripts.Services
 {
     internal class LoginService
     {

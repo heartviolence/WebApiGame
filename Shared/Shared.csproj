@@ -7,6 +7,10 @@
   </PropertyGroup>
 
 	<ItemGroup>
-		<Compile Include="..\Client\Assets\Scripts\Shared\\**\*.cs" Linkbase="Server" CopyToOutputDirectory="PreserveNewest"/>
+		<Compile Include="..\Client\Assets\Scripts\Shared\\**\*.cs" Linkbase="Server" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="MessagePack" Version="3.1.4" />
 	</ItemGroup>
 </Project>

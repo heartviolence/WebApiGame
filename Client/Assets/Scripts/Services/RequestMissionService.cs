@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using UnityEditor.PackageManager;
 using UnityEngine;
 
-namespace Assets.Scripts
+namespace Assets.Scripts.Services
 {
     internal class RequestMissionService
     {

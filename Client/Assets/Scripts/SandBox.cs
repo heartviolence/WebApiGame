@@ -1,16 +1,15 @@
 using Assets.Scripts;
+using Assets.Scripts.Services;
 using Assets.Scripts.Shared;
 using Assets.Scripts.Shared.GameDatas;
+using Assets.Scripts.Shared.Games;
+using Assets.Scripts.UIs;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
 using UnityEngine.UI;
 
 public class SandBox : MonoBehaviour
@@ -29,6 +28,14 @@ public class SandBox : MonoBehaviour
     public TMP_Text CrystalText;
     public TMP_Text RankUpText;
     public TMP_Text LevelUpText;
+    public GameStateUI ui;
+
+    public Button GameStartButton;
+    public Button SelectNpcButton;
+    public Button SelectCardButton;
+    public Button PowerUpButton;
+    public Button NextFloorButton;
+    public Button BattleEndButton;
 
     LoginService _loginService = new();
     UserService _userService = new();
@@ -36,9 +43,9 @@ public class SandBox : MonoBehaviour
     CharacterService _characterService = new();
     ServerSandBoxService _serverSandBoxService = new();
     AchievementService _achievementService = new();
+    GameService _gameService = new();
 
     UserInfoDTO _userInfo;
-
     void Start()
     {
         _client = new HttpClient();
@@ -55,7 +62,61 @@ public class SandBox : MonoBehaviour
         RankUpButton.onClick.AddListener(() => RankUp());
         ShowMetheMoneyButton.onClick.AddListener(() => ShowMetheMoney());
         GainAchievementRewardButton.onClick.AddListener(() => GainAchievementRewards());
+
+        GameStartButton.onClick.AddListener(() => GameStateStart());
+        SelectNpcButton.onClick.AddListener(() => SelectNPC());
+        SelectCardButton.onClick.AddListener(() => SelectCard());
+        PowerUpButton.onClick.AddListener(() => PowerUp());
+        NextFloorButton.onClick.AddListener(() => NextFloor());
+        BattleEndButton.onClick.AddListener(() => BattleEnd());
         Login();
+    }
+
+    async Task GameStateStart()
+    {
+        var state = await _gameService.Start();
+        ShowGameState(state);
+        UnityEngine.Debug.Log("게임 시작");
+    }
+
+    async Task SelectNPC()
+    {
+        var state = await _gameService.SelectNPC(0);
+        ShowGameState(state);
+        UnityEngine.Debug.Log("selectnpc");
+    }
+
+    async Task SelectCard()
+    {
+        var state = await _gameService.SelectCard(0);
+        ShowGameState(state);
+        UnityEngine.Debug.Log("selectcard");
+    }
+
+    async Task PowerUp()
+    {
+        var state = await _gameService.PowerUp();
+        ShowGameState(state);
+        UnityEngine.Debug.Log("powerup");
+    }
+
+    async Task NextFloor()
+    {
+        var state = await _gameService.NextFloor();
+        ShowGameState(state);
+        UnityEngine.Debug.Log("nextFloor");
+    }
+
+    async Task BattleEnd()
+    {
+        var state = await _gameService.BattleEnd();
+        ShowGameState(state);
+        UnityEngine.Debug.Log("BattleEnd");
+    }
+
+    public void ShowGameState(GameState gamestate)
+    {
+        ui.Set(gamestate);
     }
 
     async Task Login()
@@ -128,7 +189,7 @@ public class SandBox : MonoBehaviour
     async Task GainAchievementRewards()
     {
         await _achievementService.GainAchievementRewards("GachaGameAchievement");
-        await UserInfo(); 
+        await UserInfo();
     }
     void Show()
     {

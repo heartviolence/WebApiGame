@@ -33,5 +33,7 @@ namespace ServerShared.DbContexts
 
         public List<RecordItem> Records { get; set; } = new();
 
+        public string? GameState { get; set; }
+
     }
 }
