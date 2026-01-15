@@ -4,7 +4,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using SampleWebApi.Service.Achievements;
 using SampleWebApi.Service.Characters;
-using SampleWebApi.Service.Logins;
 using SampleWebApi.Service.RequestMissions;
 using SampleWebApi.Service.Users;
 using SampleWebApi.Service.Users.Items;
@@ -47,7 +46,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddScoped<LoginRepository>();
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<RequestMissionRepository>();
 builder.Services.AddScoped<RequestMissionService>();

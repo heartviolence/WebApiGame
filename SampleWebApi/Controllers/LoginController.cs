@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using SampleWebApi.Service.Logins;
+using SampleWebApi.Service.Users;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -14,11 +14,11 @@ namespace SampleWebApi.Controllers
     {
         IConfiguration _configuration;
         ILogger _logger;
-        LoginRepository _repository;
-        public LoginController(IConfiguration configuration, LoginRepository userService, ILogger<LoginController> logger)
+        UserRepository _repository;
+        public LoginController(IConfiguration configuration, UserRepository UserRepository, ILogger<LoginController> logger)
         {
             this._configuration = configuration;
-            this._repository = userService;
+            this._repository = UserRepository;
             this._logger = logger;
         }
 
@@ -35,9 +35,10 @@ namespace SampleWebApi.Controllers
         [HttpPost]
         public async Task<LoginResponse> Login([FromBody] LoginRequest request)
         {
-            var checkResult = await _repository.GetUserIdFromUsername(request.Username);
+            var checkResult = await _repository.GetUserIdFromUsername(request.Username);            
             if (checkResult.isExist)
             {
+                await _repository.UserRewardsToMailBox(checkResult.userId);
                 _logger.LogInformation("유저 로그인성공, username: {Username},userId {UserId}", request.Username, checkResult.userId);
                 return new LoginResponse() { IsSuccess = true, UserId = checkResult.userId, Token = LoginToken(request, checkResult.userId) };
             }

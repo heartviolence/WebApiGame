@@ -18,7 +18,7 @@ namespace SampleWebApi.Service.Users.Items
             var item = user.GameItems.Find(u => u.Name == itemName);
             if (item == null)
             {
-                user.GameItems.Add(new GameItem { Name = itemName, Type = ItemType(itemName), Count = count });
+                user.GameItems.Add(new GameItem { Name = itemName, Count = count });
                 return;
             }
 
@@ -38,11 +38,5 @@ namespace SampleWebApi.Service.Users.Items
 
             return false;
         }
-
-        public GameItemType ItemType(string name)
-        {
-            return GameItemType.Material;
-        }
-
     }
 }

@@ -46,5 +46,40 @@ namespace SampleWebApi.Controllers.ForTest
 
             return Ok();
         }
+
+        [HttpPost]
+        public async Task<ActionResult> AddUserReward()
+        {
+            var Items = new List<GameItem>();
+            Items.Add(new GameItem() { Name = ItemNames.IAMATOMIC, Count = 1 });
+
+            using (var context = new GameDbContext())
+            {
+                context.UserRewards.Add(new UserReward()
+                {
+                    Name = "아이템증정이벤트",
+                    Description = "",
+                    Items = Items,
+                    ExpireTime = DateTime.Now + TimeSpan.FromSeconds(30)
+                });
+
+                await context.SaveChangesAsync();
+            }
+
+            return Ok();
+        }
+
+        [HttpDelete]
+        public async Task<ActionResult> DeleteAllUserReward()
+        {
+            using (var context = new GameDbContext())
+            {
+                var targets = await context.UserRewards.Include(u => u.Items).ToListAsync();
+                context.UserRewards.RemoveRange(targets);
+                await context.SaveChangesAsync();
+            }
+
+            return Ok();
+        }
     }
 }

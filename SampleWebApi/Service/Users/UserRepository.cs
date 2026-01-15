@@ -106,5 +106,88 @@ namespace SampleWebApi.Service.Users
                 AddCharacterCode = CharacterGachaOtherOne(characterCodes)
             };
         }
+        public async Task UserRewardsToMailBox(int userId)
+        {
+            using (var context = new GameDbContext())
+            {
+                var rewards = (await context.UserRewards.ToListAsync())
+                    .Where(reward => reward.ExpireTime > DateTime.Now);
+                var user = context.UserInfos
+                    .Where(u => u.Id == userId)
+                    .SingleOrDefault();
+
+                foreach (var reward in rewards)
+                {
+                    if (!user.ReceievedUserRewards.Contains(reward.Id))
+                    {
+                        user.MailBox.Add(new UserMail()
+                        {
+                            Description = reward.Description,
+                            ExpireTime = reward.ExpireTime,
+                            Items = reward.Items,
+                            Name = reward.Name,
+                        });
+
+                        user.ReceievedUserRewards.Add(reward.Id);
+                    }
+                }
+                await context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<(bool isExist, int userId)> GetUserIdFromUsername(string username)
+        {
+            using (var context = new GameDbContext())
+            {
+                var user = await context.UserInfos
+                    .Where(u => u.Username == username)
+                    .FirstOrDefaultAsync();
+
+                if (user != null)
+                {
+                    return (true, user.Id);
+                }
+            }
+            return (false, -1);
+        }
+
+        public async Task<bool> RegisterNewUser(string username, string password)
+        {
+            using (var context = new GameDbContext())
+            {
+                var userExist = await context.UserInfos
+                    .Where(u => u.Username == username)
+                    .CountAsync();
+
+                if (userExist > 0)
+                {
+                    return false;
+                }
+
+                var user = new UserInfo()
+                {
+                    Username = username,
+                    Password = password
+                };
+
+                user.Characters.Add(DefaultGameCharacter.Sora());
+                user.Characters.Add(DefaultGameCharacter.Sia());
+                user.Characters.Add(DefaultGameCharacter.Nora());
+                user.Characters.Add(DefaultGameCharacter.Flora());
+                var userCreateEvent = Create_UserCreateEvent(username);
+                context.UserInfos.Add(user);
+                context.GameEvents.Add(userCreateEvent.CovertToGameEvent());
+                await context.SaveChangesAsync();
+            }
+            return true;
+        }
+
+        UserCreateEvent Create_UserCreateEvent(string username)
+        {
+            return new UserCreateEvent()
+            {
+                Username = username
+            };
+        }
     }
 }

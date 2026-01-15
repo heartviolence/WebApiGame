@@ -8,6 +8,7 @@ namespace ServerShared.DbContexts
         public DbSet<GameCharacter> GameCharacters { get; set; }
         public DbSet<GameEvent> GameEvents { get; set; }
         public DbSet<RequestMission> RequestMissions { get; set; }
+        public DbSet<UserReward> UserRewards { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=UserDB;Trusted_Connection=True");

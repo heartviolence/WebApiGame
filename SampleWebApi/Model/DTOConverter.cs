@@ -48,8 +48,7 @@ namespace SampleWebApi.Model
             return new GameItemDTO()
             {
                 Count = x.Count,
-                Name = x.Name,
-                Type = (Assets.Scripts.Shared.GameItemType)(int)x.Type
+                Name = x.Name
             };
         }
 
