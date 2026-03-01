@@ -28,21 +28,17 @@ namespace Assets.Scripts.Services
 
         public async Task<UserInfoDTO> GetUserInfo()
         {
-            HttpResponseMessage response = await GameApiClient.Client.GetAsync($"User/GetUserInfo");
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadFromJsonAsync<UserInfoDTO>();
+            return await ApiCallHelper.GetAsync<UserInfoDTO>($"User/GetUserInfo");
         }
 
         public async Task Gacha()
         {
-            HttpResponseMessage response = await GameApiClient.Client.PostAsync($"User/Gacha", new StringContent(""));
-            response.EnsureSuccessStatusCode();
+            await ApiCallHelper.PostAsync($"User/Gacha");
         }
 
         public async Task DeleteAll()
         {
-            HttpResponseMessage response = await GameApiClient.Client.DeleteAsync($"User/DeleteAll");
-            response.EnsureSuccessStatusCode();
+            await ApiCallHelper.DeleteAsync($"User/DeleteAll");
         }
 
     }

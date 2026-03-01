@@ -25,9 +25,8 @@ namespace Assets.Scripts.Services
                 Username = username,
                 Password = password
             };
-            HttpResponseMessage response = await GameApiClient.Client.PostAsJsonAsync("Login/Register", loginRequest);
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadFromJsonAsync<RegisterResponse>();
+
+            return await ApiCallHelper.PostAsync<LoginRequest, RegisterResponse>("Login/Register", loginRequest);
         }
 
         public async Task<LoginResponse> Login(string username, string password)
@@ -37,12 +36,9 @@ namespace Assets.Scripts.Services
                 Username = username,
                 Password = password
             };
-
-            var loginResponse = await GameApiClient.Client.PostAsJsonAsync($"Login/Login", loginRequest);
-            loginResponse.EnsureSuccessStatusCode();
-            var result = await loginResponse.Content.ReadFromJsonAsync<LoginResponse>();
-            GameApiClient.Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.Token);
-            return result;
+            var loginResponse = await ApiCallHelper.PostAsync<LoginRequest, LoginResponse>("Login/Login", loginRequest);
+            GameApiClient.Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResponse.Token);
+            return loginResponse;
         }
     }
 }

@@ -16,8 +16,7 @@ namespace Assets.Scripts.Services
 
         public async Task ShowMetheMoney()
         {
-            HttpResponseMessage response = await GameApiClient.Client.PostAsync("SandBox/ShowMetheMoney", new StringContent(""));
-            response.EnsureSuccessStatusCode();
+            await ApiCallHelper.PostAsync("SandBox/ShowMetheMoney");
         }
     }
 }

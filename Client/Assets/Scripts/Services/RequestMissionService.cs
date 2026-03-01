@@ -17,17 +17,15 @@ namespace Assets.Scripts.Services
             var requestBody = new RequestMissionStartRequest()
             {
                 MissionCode = "00-00-01",
-                CharacterCode = new() { "00_01", "00_04" }
+                CharacterCode = new() { "Sora", "Flora" }
             };
-            HttpResponseMessage response = await GameApiClient.Client.PostAsJsonAsync($"RequestMission/StartMission", requestBody);
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadFromJsonAsync<bool>();
+
+            return await ApiCallHelper.PostAsync<RequestMissionStartRequest, bool>($"RequestMission/StartMission", requestBody);
         }
 
         public async Task RequestMissionCompleteCheck()
         {
-            HttpResponseMessage response = await GameApiClient.Client.PutAsync($"RequestMission/RequestMissionCompleteCheck", new StringContent(""));
-            response.EnsureSuccessStatusCode();
+            await ApiCallHelper.PutAsync($"RequestMission/RequestMissionCompleteCheck");
         }
     }
 }

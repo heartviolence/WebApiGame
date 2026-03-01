@@ -10,8 +10,7 @@ namespace Assets.Scripts.Services
     {
         public async Task GainAchievementRewards(string achievementName)
         {
-            HttpResponseMessage response = await GameApiClient.Client.PostAsync($"Achievement/GainAcheivementRewards?achievementName={achievementName}", new StringContent(""));
-            response.EnsureSuccessStatusCode();
+            await ApiCallHelper.PostAsync($"Achievement/GainAcheivementRewards?achievementName={achievementName}");
         }
     }
 }
