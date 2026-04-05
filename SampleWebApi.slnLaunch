@@ -1,0 +1,19 @@
+[
+  {
+    "Name": "프로젝트 전부시작",
+    "Projects": [
+      {
+        "Path": "SampleWebApi\\SampleWebApi.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "AchievementWorker\\AchievementWorker.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "EventCollector\\EventCollector.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

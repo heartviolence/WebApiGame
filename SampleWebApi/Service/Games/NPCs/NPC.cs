@@ -18,7 +18,7 @@ namespace SampleWebApi.Service.Games.NPCs
 
         public void Select(GameState gamestate, int index)
         {
-            if (Selections.Count < index)
+            if (Selections.Count <= index)
             {
                 return;
             }
