@@ -9,7 +9,7 @@ namespace SampleWebApi.Service.Users.Items
         {
         }
 
-        public void AddItem(UserInfo user, string itemName, int count)
+        public void AddItem(UserAccountDetail user, string itemName, int count)
         {
             if (ProcessSpecialItem(user, itemName, count))
             {
@@ -25,7 +25,7 @@ namespace SampleWebApi.Service.Users.Items
             item.Count += count;
         }
 
-        bool ProcessSpecialItem(UserInfo user, string itemName, int count)
+        bool ProcessSpecialItem(UserAccountDetail user, string itemName, int count)
         {
             switch (itemName)
             {

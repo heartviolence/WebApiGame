@@ -30,6 +30,10 @@ public class SandBox : MonoBehaviour
     public TMP_Text LevelUpText;
     public GameStateUI ui;
 
+    public TMP_InputField LoginUsernameInputfield;
+
+    public Button LoginButton;
+    public Button LogoutButton;
     public Button GameStartButton;
     public Button SelectNpcButton;
     public Button SelectCardButton;
@@ -69,7 +73,8 @@ public class SandBox : MonoBehaviour
         PowerUpButton.onClick.AddListener(() => PowerUp());
         NextFloorButton.onClick.AddListener(() => NextFloor());
         BattleEndButton.onClick.AddListener(() => BattleEnd());
-        Login();
+        LoginButton.onClick.AddListener(() => Login());
+        LogoutButton.onClick.AddListener(() => LogOut());
     }
 
     async Task GameStateStart()
@@ -119,11 +124,26 @@ public class SandBox : MonoBehaviour
         ui.Set(gamestate);
     }
 
+    async Task LogOut()
+    {
+        await _loginService.Logout();
+    }
     async Task Login()
     {
-        await _loginService.Register("admin", "password");
-        await _loginService.Login("admin", "password");
-        Debug.Log("로그인 완료");
+        var username = LoginUsernameInputfield.text;
+
+        try
+        {
+            await _loginService.Register(username, "password");
+            await Task.Delay(2000);
+            await _loginService.Login(username, "password");
+            Debug.Log("로그인 완료");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            return;
+        }
         await UserInfo();
         Show();
     }

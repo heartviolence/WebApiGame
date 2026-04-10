@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ServerShared.DbContexts;
 using ServerShared.Events;
+using ServerShared.Shards;
 
 namespace SampleWebApi.Service.RequestMissions
 {
@@ -21,9 +22,9 @@ namespace SampleWebApi.Service.RequestMissions
                 return false;
             }
 
-            using (var context = new GameDbContext())
+            await using (var context = await GameDbUtil.CreateGameDbContext(userId))
             {
-                var user = await context.UserInfos.Where(u => u.Id == userId)
+                var user = await context.UserDetails.Where(u => u.UserId == userId)
                     .Include(u => u.Characters)
                     .Include(u => u.RequestMissions)
                     .FirstOrDefaultAsync();
@@ -57,9 +58,9 @@ namespace SampleWebApi.Service.RequestMissions
 
         public async Task RequestMissionCompleteCheck(int userId)
         {
-            using (var context = new GameDbContext())
+            await using (var context = await GameDbUtil.CreateGameDbContext(userId))
             {
-                var user = await context.UserInfos.Where(u => u.Id == userId)
+                var user = await context.UserDetails.Where(u => u.UserId == userId)
                     .Include(u => u.RequestMissions)
                     .FirstOrDefaultAsync();
 

@@ -9,11 +9,11 @@ using ServerShared.DbContexts;
 
 #nullable disable
 
-namespace ServerShared.Migrations
+namespace ServerShared.Migrations.GameDB
 {
     [DbContext(typeof(GameDbContext))]
-    [Migration("20260107144833_update_completedAchivement_ColumnName")]
-    partial class update_completedAchivement_ColumnName
+    [Migration("20260410043230_ShardTest")]
+    partial class ShardTest
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -59,12 +59,12 @@ namespace ServerShared.Migrations
                     b.Property<int>("RewardCheckPoint")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserInfoId")
+                    b.Property<int?>("UserAccountDetailUserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserInfoId");
+                    b.HasIndex("UserAccountDetailUserId");
 
                     b.ToTable("CompletedAchievement");
                 });
@@ -99,12 +99,12 @@ namespace ServerShared.Migrations
                     b.Property<int>("StarLevel")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserInfoId")
+                    b.Property<int?>("UserAccountDetailUserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserInfoId");
+                    b.HasIndex("UserAccountDetailUserId");
 
                     b.ToTable("GameCharacters");
                 });
@@ -156,15 +156,17 @@ namespace ServerShared.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Type")
+                    b.Property<int?>("UserAccountDetailUserId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserInfoId")
+                    b.Property<int?>("UserMailId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserInfoId");
+                    b.HasIndex("UserAccountDetailUserId");
+
+                    b.HasIndex("UserMailId");
 
                     b.ToTable("GameItem");
                 });
@@ -184,12 +186,12 @@ namespace ServerShared.Migrations
                     b.Property<int>("StarLevel")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserInfoId")
+                    b.Property<int?>("UserAccountDetailUserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserInfoId");
+                    b.HasIndex("UserAccountDetailUserId");
 
                     b.ToTable("RecordItem");
                 });
@@ -209,23 +211,20 @@ namespace ServerShared.Migrations
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("UserInfoId")
+                    b.Property<int?>("UserAccountDetailUserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserInfoId");
+                    b.HasIndex("UserAccountDetailUserId");
 
                     b.ToTable("RequestMissions");
                 });
 
-            modelBuilder.Entity("ServerShared.DbContexts.UserInfo", b =>
+            modelBuilder.Entity("ServerShared.DbContexts.UserAccountDetail", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AchievementDataId")
                         .HasColumnType("int");
@@ -233,65 +232,100 @@ namespace ServerShared.Migrations
                     b.Property<int>("Crystal")
                         .HasColumnType("int");
 
+                    b.Property<string>("GameState")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Nickname")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Password")
+                    b.PrimitiveCollection<string>("ReceievedUserRewards")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.HasKey("Id");
+                    b.HasKey("UserId");
 
                     b.HasIndex("AchievementDataId");
 
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("UserInfos");
+                    b.ToTable("UserDetails");
+                });
+
+            modelBuilder.Entity("ServerShared.DbContexts.UserMail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ExpireTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("UserAccountDetailUserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserAccountDetailUserId");
+
+                    b.ToTable("UserMail");
                 });
 
             modelBuilder.Entity("ServerShared.DbContexts.CompletedAchievement", b =>
                 {
-                    b.HasOne("ServerShared.DbContexts.UserInfo", null)
+                    b.HasOne("ServerShared.DbContexts.UserAccountDetail", null)
                         .WithMany("CompletedAchievements")
-                        .HasForeignKey("UserInfoId");
+                        .HasForeignKey("UserAccountDetailUserId");
                 });
 
             modelBuilder.Entity("ServerShared.DbContexts.GameCharacter", b =>
                 {
-                    b.HasOne("ServerShared.DbContexts.UserInfo", null)
+                    b.HasOne("ServerShared.DbContexts.UserAccountDetail", null)
                         .WithMany("Characters")
-                        .HasForeignKey("UserInfoId");
+                        .HasForeignKey("UserAccountDetailUserId");
                 });
 
             modelBuilder.Entity("ServerShared.DbContexts.GameItem", b =>
                 {
-                    b.HasOne("ServerShared.DbContexts.UserInfo", null)
+                    b.HasOne("ServerShared.DbContexts.UserAccountDetail", null)
                         .WithMany("GameItems")
-                        .HasForeignKey("UserInfoId");
+                        .HasForeignKey("UserAccountDetailUserId");
+
+                    b.HasOne("ServerShared.DbContexts.UserMail", null)
+                        .WithMany("Items")
+                        .HasForeignKey("UserMailId");
                 });
 
             modelBuilder.Entity("ServerShared.DbContexts.RecordItem", b =>
                 {
-                    b.HasOne("ServerShared.DbContexts.UserInfo", null)
+                    b.HasOne("ServerShared.DbContexts.UserAccountDetail", null)
                         .WithMany("Records")
-                        .HasForeignKey("UserInfoId");
+                        .HasForeignKey("UserAccountDetailUserId");
                 });
 
             modelBuilder.Entity("ServerShared.DbContexts.RequestMission", b =>
                 {
-                    b.HasOne("ServerShared.DbContexts.UserInfo", null)
+                    b.HasOne("ServerShared.DbContexts.UserAccountDetail", null)
                         .WithMany("RequestMissions")
-                        .HasForeignKey("UserInfoId");
+                        .HasForeignKey("UserAccountDetailUserId");
                 });
 
-            modelBuilder.Entity("ServerShared.DbContexts.UserInfo", b =>
+            modelBuilder.Entity("ServerShared.DbContexts.UserAccountDetail", b =>
                 {
                     b.HasOne("ServerShared.DbContexts.AchievementsData", "AchievementData")
                         .WithMany()
@@ -302,7 +336,14 @@ namespace ServerShared.Migrations
                     b.Navigation("AchievementData");
                 });
 
-            modelBuilder.Entity("ServerShared.DbContexts.UserInfo", b =>
+            modelBuilder.Entity("ServerShared.DbContexts.UserMail", b =>
+                {
+                    b.HasOne("ServerShared.DbContexts.UserAccountDetail", null)
+                        .WithMany("MailBox")
+                        .HasForeignKey("UserAccountDetailUserId");
+                });
+
+            modelBuilder.Entity("ServerShared.DbContexts.UserAccountDetail", b =>
                 {
                     b.Navigation("Characters");
 
@@ -310,9 +351,16 @@ namespace ServerShared.Migrations
 
                     b.Navigation("GameItems");
 
+                    b.Navigation("MailBox");
+
                     b.Navigation("Records");
 
                     b.Navigation("RequestMissions");
+                });
+
+            modelBuilder.Entity("ServerShared.DbContexts.UserMail", b =>
+                {
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }

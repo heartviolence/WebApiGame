@@ -5,11 +5,11 @@ namespace SampleWebApi.Model
 {
     public static class DTOConverter
     {
-        public static UserInfoDTO DTO(this UserInfo x)
+        public static UserInfoDTO DTO(this UserAccountDetail x)
         {
             return new UserInfoDTO()
             {
-                Id = x.Id,
+                Id = x.UserId,
                 Username = x.Username,
                 Nickname = x.Nickname,
                 Characters = x.Characters.ConvertAll(x => x.DTO()),

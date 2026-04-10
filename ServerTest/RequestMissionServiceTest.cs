@@ -74,7 +74,7 @@ namespace ServerTest
         [Test]
         public void ProcessCompleteMission()
         {
-            UserInfo userInfo = new()
+            UserAccountDetail userInfo = new()
             {
                 Username = "Test",
                 Crystal = 0,

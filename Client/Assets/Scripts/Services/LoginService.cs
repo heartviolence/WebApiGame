@@ -40,5 +40,10 @@ namespace Assets.Scripts.Services
             GameApiClient.Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResponse.Token);
             return loginResponse;
         }
+        public async Task Logout()
+        {
+            GameApiClient.Client.DefaultRequestHeaders.Authorization = null;
+            await Task.CompletedTask;
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Assets.Scripts.Shared;
 using Microsoft.EntityFrameworkCore;
 using ServerShared.DbContexts;
+using ServerShared.Shards;
 
 namespace SampleWebApi.Service.Achievements
 {
@@ -14,10 +15,10 @@ namespace SampleWebApi.Service.Achievements
 
         public async Task GainAcheivementRewards(int userId, string achievementName)
         {
-            using (var context = new GameDbContext())
+            await using (var context = await GameDbUtil.CreateGameDbContext(userId))
             {
-                var user = context.UserInfos
-                    .Where(u => u.Id == userId)
+                var user = context.UserDetails
+                    .Where(u => u.UserId == userId)
                     .Include(u => u.CompletedAchievements)
                     .SingleOrDefault();
 

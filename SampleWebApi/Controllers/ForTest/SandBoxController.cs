@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using SampleWebApi.Model.Items;
 using SampleWebApi.Service.Users.Items;
 using ServerShared.DbContexts;
+using ServerShared.Shards;
 
 namespace SampleWebApi.Controllers.ForTest
 {
@@ -30,10 +31,10 @@ namespace SampleWebApi.Controllers.ForTest
                 return BadRequest();
             }
 
-            using (var context = new GameDbContext())
+            await using (var context = await GameDbUtil.CreateGameDbContext(userId))
             {
-                var user = context.UserInfos
-                    .Where(u => u.Id == userId)
+                var user = context.UserDetails
+                    .Where(u => u.UserId == userId)
                     .Include(u => u.GameItems)
                     .SingleOrDefault();
 
@@ -53,7 +54,7 @@ namespace SampleWebApi.Controllers.ForTest
             var Items = new List<GameItem>();
             Items.Add(new GameItem() { Name = ItemNames.IAMATOMIC, Count = 1 });
 
-            using (var context = new GameDbContext())
+            using (var context = new UserAccountDbContext())
             {
                 context.UserRewards.Add(new UserReward()
                 {
@@ -72,7 +73,7 @@ namespace SampleWebApi.Controllers.ForTest
         [HttpDelete]
         public async Task<ActionResult> DeleteAllUserReward()
         {
-            using (var context = new GameDbContext())
+            using (var context = new UserAccountDbContext())
             {
                 var targets = await context.UserRewards.Include(u => u.Items).ToListAsync();
                 context.UserRewards.RemoveRange(targets);

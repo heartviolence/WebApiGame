@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using SampleWebApi.Model;
 using SampleWebApi.Service.Games;
 using ServerShared.DbContexts;
+using ServerShared.Shards;
 using System.Text.Json;
 
 namespace SampleWebApi.Controllers
@@ -28,9 +29,9 @@ namespace SampleWebApi.Controllers
                 _logger.LogInformation("토큰에서 UserId를 찾지못함");
             }
 
-            using (var context = new GameDbContext())
+            await using (var context = await GameDbUtil.CreateGameDbContext(userId))
             {
-                var user = context.UserInfos.Where(u => u.Id == userId)
+                var user = context.UserDetails.Where(u => u.UserId == userId)
                     .FirstOrDefault();
 
                 var gamestate = new GameState();
@@ -51,9 +52,9 @@ namespace SampleWebApi.Controllers
                 _logger.LogInformation("토큰에서 UserId를 찾지못함");
             }
 
-            using (var context = new GameDbContext())
+            await using (var context = await GameDbUtil.CreateGameDbContext(userId))
             {
-                var user = context.UserInfos.Where(u => u.Id == userId)
+                var user = context.UserDetails.Where(u => u.UserId == userId)
                     .FirstOrDefault();
 
                 var gamestate = MessagePackSerializer.Deserialize<GameState>(Convert.FromBase64String(user.GameState));
@@ -74,9 +75,9 @@ namespace SampleWebApi.Controllers
                 _logger.LogInformation("토큰에서 UserId를 찾지못함");
             }
 
-            using (var context = new GameDbContext())
+            await using (var context = await GameDbUtil.CreateGameDbContext(userId))
             {
-                var user = context.UserInfos.Where(u => u.Id == userId)
+                var user = context.UserDetails.Where(u => u.UserId == userId)
                     .FirstOrDefault();
 
                 var gamestate = MessagePackSerializer.Deserialize<GameState>(Convert.FromBase64String(user.GameState));
@@ -96,9 +97,9 @@ namespace SampleWebApi.Controllers
             {
                 _logger.LogInformation("토큰에서 UserId를 찾지못함");
             }
-            using (var context = new GameDbContext())
+            await using (var context = await GameDbUtil.CreateGameDbContext(userId))
             {
-                var user = context.UserInfos.Where(u => u.Id == userId)
+                var user = context.UserDetails.Where(u => u.UserId == userId)
                     .FirstOrDefault();
 
                 var gamestate = MessagePackSerializer.Deserialize<GameState>(Convert.FromBase64String(user.GameState));
@@ -119,9 +120,9 @@ namespace SampleWebApi.Controllers
                 _logger.LogInformation("토큰에서 UserId를 찾지못함");
             }
 
-            using (var context = new GameDbContext())
+            await using (var context = await GameDbUtil.CreateGameDbContext(userId))
             {
-                var user = context.UserInfos.Where(u => u.Id == userId)
+                var user = context.UserDetails.Where(u => u.UserId == userId)
                     .FirstOrDefault();
 
                 var gamestate = MessagePackSerializer.Deserialize<GameState>(Convert.FromBase64String(user.GameState));
@@ -142,9 +143,9 @@ namespace SampleWebApi.Controllers
                 _logger.LogInformation("토큰에서 UserId를 찾지못함");
             }
 
-            using (var context = new GameDbContext())
+            await using (var context = await GameDbUtil.CreateGameDbContext(userId))
             {
-                var user = context.UserInfos.Where(u => u.Id == userId)
+                var user = context.UserDetails.Where(u => u.UserId == userId)
                     .FirstOrDefault();
 
                 var gamestate = MessagePackSerializer.Deserialize<GameState>(Convert.FromBase64String(user.GameState));

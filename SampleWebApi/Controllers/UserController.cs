@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using SampleWebApi.Model;
 using SampleWebApi.Service.Users;
 using ServerShared.DbContexts;
+using ServerShared.Shards;
 
 namespace SampleWebApi.Controllers
 {
@@ -47,9 +48,13 @@ namespace SampleWebApi.Controllers
             }
 
             var userInfo = await _repository.GetUserInfo(userId);
+            if(userInfo == null)
+            { 
+                _logger.LogInformation("유저데이터를 찾지못함 userId:{UserId}", userId);
+                return NotFound();
+            }
             _logger.LogInformation("유저데이터 조회 성공 userId:{UserId}", userId);
             return Ok(userInfo.DTO());
-
         }
 
 
@@ -63,9 +68,9 @@ namespace SampleWebApi.Controllers
                 return BadRequest();
             }
 
-            using (var context = new GameDbContext())
+            await using (var context = await GameDbUtil.CreateGameDbContext(userId))
             {
-                var user = context.UserInfos.Where(u => u.Id == userId)
+                var user = context.UserDetails.Where(u => u.UserId == userId)
                     .Include(u => u.Characters)
                     .FirstOrDefault();
 

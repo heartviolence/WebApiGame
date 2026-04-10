@@ -24,7 +24,7 @@ namespace AchievementWorker
             });
         }
 
-        public void Check(UserInfo user)
+        public void Check(UserAccountDetail user)
         {
             var thisAchievement = user.CompletedAchievements.Where(e => e.AchievementName == nameof(GachaGameAchievement)).SingleOrDefault();
             if (thisAchievement == null)

@@ -3,6 +3,7 @@ using SampleWebApi.Model.Characters;
 using SampleWebApi.Service.Characters;
 using ServerShared.DbContexts;
 using ServerShared.Events;
+using ServerShared.Shards;
 
 namespace SampleWebApi.Service.Users
 {
@@ -15,12 +16,12 @@ namespace SampleWebApi.Service.Users
             this._gameCharacterData = gameCharacterData;
         }
 
-        public async Task<UserInfo> GetUserInfo(int userId)
+        public async Task<UserAccountDetail> GetUserInfo(int userId)
         {
-            using (var context = new GameDbContext())
+            await using (var context = await GameDbUtil.CreateGameDbContext(userId))
             {
-                return await context.UserInfos
-                    .Where(u => u.Id == userId)
+                return await context.UserDetails
+                    .Where(u => u.UserId == userId)
                     .Include(u => u.Characters)
                     .Include(u => u.RequestMissions)
                     .Include(u => u.GameItems)
@@ -32,10 +33,10 @@ namespace SampleWebApi.Service.Users
 
         public async Task<List<GameCharacter>> GetCharacters(int userId)
         {
-            using (var context = new GameDbContext())
+            await using (var context = await GameDbUtil.CreateGameDbContext(userId))
             {
-                List<GameCharacter> characters = await context.UserInfos
-                    .Where(u => u.Id == userId)
+                List<GameCharacter> characters = await context.UserDetails
+                    .Where(u => u.UserId == userId)
                     .Select(u => u.Characters)
                     .FirstOrDefaultAsync();
 
@@ -45,11 +46,11 @@ namespace SampleWebApi.Service.Users
 
         public async Task Gacha(int userId)
         {
-            using (var context = new GameDbContext())
+            await using (var context = await GameDbUtil.CreateGameDbContext(userId))
             {
-                var userData = await context.UserInfos
+                var userData = await context.UserDetails
                     .Include(u => u.Characters)
-                    .FirstOrDefaultAsync(u => u.Id == userId);
+                    .FirstOrDefaultAsync(u => u.UserId == userId);
 
                 if (userData == null)
                 {
@@ -73,7 +74,7 @@ namespace SampleWebApi.Service.Users
             }
         }
 
-        bool PayGachaCrystal(UserInfo user)
+        bool PayGachaCrystal(UserAccountDetail user)
         {
             int gachaPay = 10;
             if (user.Crystal < gachaPay)
@@ -108,12 +109,20 @@ namespace SampleWebApi.Service.Users
         }
         public async Task UserRewardsToMailBox(int userId)
         {
-            using (var context = new GameDbContext())
+            List<UserReward> rewards;
+            using (var rewardContext = new UserAccountDbContext())
             {
-                var rewards = (await context.UserRewards.ToListAsync())
-                    .Where(reward => reward.ExpireTime > DateTime.Now);
-                var user = context.UserInfos
-                    .Where(u => u.Id == userId)
+                rewards = await rewardContext.UserRewards.Where(reward => reward.ExpireTime > DateTime.Now).ToListAsync();
+                if (rewards.Count == 0)
+                {
+                    return;
+                }
+            }
+
+            await using (var context = await GameDbUtil.CreateGameDbContext(userId))
+            {
+                var user = context.UserDetails
+                    .Where(u => u.UserId == userId)
                     .SingleOrDefault();
 
                 foreach (var reward in rewards)
@@ -137,15 +146,15 @@ namespace SampleWebApi.Service.Users
 
         public async Task<(bool isExist, int userId)> GetUserIdFromUsername(string username)
         {
-            using (var context = new GameDbContext())
+            using (var context = new UserAccountDbContext())
             {
-                var user = await context.UserInfos
+                var user = await context.UserAccounts
                     .Where(u => u.Username == username)
                     .FirstOrDefaultAsync();
 
                 if (user != null)
                 {
-                    return (true, user.Id);
+                    return (true, user.UserId);
                 }
             }
             return (false, -1);
@@ -153,9 +162,9 @@ namespace SampleWebApi.Service.Users
 
         public async Task<bool> RegisterNewUser(string username, string password)
         {
-            using (var context = new GameDbContext())
+            using (var context = new UserAccountDbContext())
             {
-                var userExist = await context.UserInfos
+                var userExist = await context.UserAccounts
                     .Where(u => u.Username == username)
                     .CountAsync();
 
@@ -164,27 +173,23 @@ namespace SampleWebApi.Service.Users
                     return false;
                 }
 
-                var user = new UserInfo()
+                var user = new UserAccount()
                 {
                     Username = username,
                     Password = password
                 };
 
-                user.Characters.Add(DefaultGameCharacter.Sora());
-                user.Characters.Add(DefaultGameCharacter.Sia());
-                user.Characters.Add(DefaultGameCharacter.Nora());
-                user.Characters.Add(DefaultGameCharacter.Flora());
                 var userCreateEvent = Create_UserCreateEvent(username);
-                context.UserInfos.Add(user);
+                context.UserAccounts.Add(user);
                 context.GameEvents.Add(userCreateEvent.CovertToGameEvent());
                 await context.SaveChangesAsync();
             }
             return true;
         }
 
-        UserCreateEvent Create_UserCreateEvent(string username)
+        UserAccountCreatedEvent Create_UserCreateEvent(string username)
         {
-            return new UserCreateEvent()
+            return new UserAccountCreatedEvent()
             {
                 Username = username
             };

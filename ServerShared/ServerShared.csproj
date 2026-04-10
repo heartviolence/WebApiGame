@@ -17,6 +17,8 @@
 
   <ItemGroup>
     <Folder Include="Migrations\" />
+    <Folder Include="Migrations\GameDB\SQL\" />
+    <Folder Include="Migrations\UserAccountDB\" />
   </ItemGroup>
 
 </Project>

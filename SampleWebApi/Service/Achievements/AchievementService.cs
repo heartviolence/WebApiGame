@@ -13,7 +13,7 @@ namespace SampleWebApi.Service.Achievements
             this._itemService = itemService;
         }
 
-        public void GainAchievementRewards(UserInfo user, CompletedAchievement completedAchievement)
+        public void GainAchievementRewards(UserAccountDetail user, CompletedAchievement completedAchievement)
         {
             if (completedAchievement is null ||
                 completedAchievement.Level <= completedAchievement.RewardCheckPoint)

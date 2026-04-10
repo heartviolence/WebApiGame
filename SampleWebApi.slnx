@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="AchievementWorker/AchievementWorker.csproj" Id="6bfc9e23-2a00-4800-91e2-7cfd1fd4f741" />
+  <Project Path="DbUpdater/DbUpdater.csproj" Id="9088a222-7870-42ae-bebe-13d9ef6c08bb" />
   <Project Path="EventCollector/EventCollector.csproj" Id="0155b9c1-14bd-4df8-b783-a061e0b4464b" />
   <Project Path="SampleWebApi/SampleWebApi.csproj" />
   <Project Path="ServerShared/ServerShared.csproj" Id="fe58abe4-1b45-4091-81df-19362107f1f5" />

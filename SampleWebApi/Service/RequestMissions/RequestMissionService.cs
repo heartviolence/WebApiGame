@@ -95,7 +95,7 @@ namespace SampleWebApi.Service.RequestMissions
             return true;
         }
 
-        public List<GetMissionRewardEvent> ProcessCompleteMission(UserInfo userData, string completedMissionCode)
+        public List<GetMissionRewardEvent> ProcessCompleteMission(UserAccountDetail userData, string completedMissionCode)
         {
             List<GetMissionRewardEvent> events = new List<GetMissionRewardEvent>();
             var rewards = _missionProvider.Missions[completedMissionCode].Rewards;
@@ -110,7 +110,7 @@ namespace SampleWebApi.Service.RequestMissions
                         _logger.LogInformation("User의 크리스탈+{Crystal},적용후+{CrystalCurrent}", reward.MinCount, userData.Crystal);
                         events.Add(new GetMissionRewardEvent()
                         {
-                            UserId = userData.Id,
+                            UserId = userData.UserId,
                             ItemCode = reward.ItemCode,
                             BeforeItemCount = beforeCrystal,
                             AeforeItemCount = userData.Crystal

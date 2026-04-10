@@ -10,7 +10,7 @@ namespace SampleWebApi.Service.Characters
 
         }
 
-        public void UseLevelUpItem(UserInfo user, GameCharacter character, int itemCount)
+        public void UseLevelUpItem(UserAccountDetail user, GameCharacter character, int itemCount)
         {
             var item = user.GameItems.Where(i => i.Name == ItemNames.CharacterLevelUpMaterial).SingleOrDefault();
             if (item == null || item.Count < itemCount)
@@ -24,7 +24,7 @@ namespace SampleWebApi.Service.Characters
             item.Count = item.Count - itemCount + surplusItemCount;
         }
 
-        public void RankUp(UserInfo user, GameCharacter character)
+        public void RankUp(UserAccountDetail user, GameCharacter character)
         {
             if (character.Rank == MaxRank() ||
                 IsRankLimit(character.Rank, character.Level) == false)

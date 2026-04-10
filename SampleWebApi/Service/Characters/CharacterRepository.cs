@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ServerShared.DbContexts;
+using ServerShared.Shards;
 
 namespace SampleWebApi.Service.Characters
 {
@@ -13,10 +14,10 @@ namespace SampleWebApi.Service.Characters
 
         public async Task<GameCharacter> UseLevelUpItem(int userId, string characterName, int itemCount)
         {
-            using (var context = new GameDbContext())
+            await using (var context = await GameDbUtil.CreateGameDbContext(userId))
             {
-                var user = context.UserInfos
-                    .Where(u => u.Id == userId)
+                var user = context.UserDetails
+                    .Where(u => u.UserId == userId)
                     .Include(u => u.Characters)
                     .Include(u => u.GameItems)
                     .SingleOrDefault();
@@ -35,10 +36,10 @@ namespace SampleWebApi.Service.Characters
 
         public async Task<GameCharacter> RankUp(int userId, string characterName)
         {
-            using (var context = new GameDbContext())
+            await using (var context = await GameDbUtil.CreateGameDbContext(userId))
             {
-                var user = context.UserInfos
-                    .Where(u => u.Id == userId)
+                var user = context.UserDetails
+                    .Where(u => u.UserId == userId)
                     .Include(u => u.Characters)
                     .Include(u => u.GameItems)
                     .SingleOrDefault();

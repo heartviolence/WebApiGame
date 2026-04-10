@@ -1,22 +1,21 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 
 namespace ServerShared.DbContexts
 {
 
     [Index(nameof(Username), IsUnique = true)]
-    public class UserInfo
+    public class UserAccountDetail
     {
         [Key]
-        public int Id { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public int UserId { get; set; }
 
         [Required]
         [MaxLength(50)]
         public string Username { get; set; }
-        [Required]
-        [MaxLength(100)]
-        public string Password { get; set; }
 
         public string? Nickname { get; set; }
 
