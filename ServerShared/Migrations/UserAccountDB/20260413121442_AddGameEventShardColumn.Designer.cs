@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ServerShared.DbContexts;
 
@@ -11,9 +12,11 @@ using ServerShared.DbContexts;
 namespace ServerShared.Migrations.UserAccountDB
 {
     [DbContext(typeof(UserAccountDbContext))]
-    partial class UserAccountDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260413121442_AddGameEventShardColumn")]
+    partial class AddGameEventShardColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

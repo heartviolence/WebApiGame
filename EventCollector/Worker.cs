@@ -54,14 +54,17 @@ namespace EventCollector
                 await accountContext.SaveChangesAsync();
             }
 
-            foreach (var connectionString in _connectionStrings)
+            for (int i = 0; i < _connectionStrings.Count; i++)
             {
+                var connectionString = _connectionStrings[i];
+
                 using (var context = new GameDbContext(connectionString))
                 {
                     var events = context.GameEvents.Take(100).ToList();
 
                     foreach (var e in events)
                     {
+                        e.Shard = i;
                         PubAckResponse ack = await js.PublishAsync($"game.GameEvent", e);
                         ack.EnsureSuccess();
                         logger.LogInformation("{DateTime} : {EventType}", DateTimeOffset.Now, e.EventType);

@@ -10,6 +10,8 @@
 
         public int UserId { get; set; } = -1;
 
+        public int Shard { get; set; } = -1; // 이벤트 발생한 샤드 정보
+
         public string EventVersion { get; set; } //이벤트 처리기 버전관리용
 
         public string Description { get; set; } = string.Empty;//로그

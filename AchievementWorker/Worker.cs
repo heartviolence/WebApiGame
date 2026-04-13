@@ -110,7 +110,7 @@ namespace AchievementWorker
             {
                 case nameof(CharacterGachaEvent):
                     var gachaEvent = JsonSerializer.Deserialize<CharacterGachaEvent>(e.Payload);
-                    await OnCharacterGacha(gachaEvent);
+                    await OnCharacterGacha(gachaEvent, e.Shard);
                     break;
                 case nameof(UserAccountDetailCreatedEvent):
                     var userAccountDetailCreatedEvent = JsonSerializer.Deserialize<UserAccountDetailCreatedEvent>(e.Payload);
@@ -121,9 +121,9 @@ namespace AchievementWorker
             }
         }
 
-        async Task OnCharacterGacha(CharacterGachaEvent e)
+        async Task OnCharacterGacha(CharacterGachaEvent e, int shardNumber)
         {
-            await using (var context = await GameDbUtil.CreateGameDbContext(e.UserId))
+            await using (var context = new GameDbContext(GameDbUtil.CreateConnectionString(shardNumber)))
             {
                 var user = context.UserDetails.Where(u => u.UserId == e.UserId)
                     .Include(e => e.AchievementData)

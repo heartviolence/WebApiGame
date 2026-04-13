@@ -7,10 +7,23 @@ using SampleWebApi.Service.Characters;
 using SampleWebApi.Service.RequestMissions;
 using SampleWebApi.Service.Users;
 using SampleWebApi.Service.Users.Items;
+using Serilog;
+using Serilog.Formatting.Json;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .Enrich.FromLogContext()
+    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
+    //.WriteTo.File(new JsonFormatter(),
+    //    "logs/log-.json",
+    //    rollingInterval: RollingInterval.Day,
+    //    retainedFileCountLimit: 7)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen(options =>
