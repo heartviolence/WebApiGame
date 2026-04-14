@@ -107,38 +107,38 @@ namespace SampleWebApi.Service.Users
                 AddCharacterCode = CharacterGachaOtherOne(characterCodes)
             };
         }
-        public async Task UserRewardsToMailBox(int userId)
+        public async Task GrantItemToMailBox(int userId)
         {
-            List<UserReward> rewards;
+            List<GrantItem> grantItems;
             using (var rewardContext = new UserAccountDbContext())
             {
-                rewards = await rewardContext.UserRewards.Where(reward => reward.ExpireTime > DateTime.Now).ToListAsync();
-                if (rewards.Count == 0)
+                grantItems = await rewardContext.GrantItems.Where(reward => reward.ExpireTime > DateTime.Now).ToListAsync();
+                if (grantItems.Count == 0)
                 {
                     return;
                 }
             }
 
+            var grantItemIds = grantItems.Select(r => r.Id).ToList();
             await using (var context = await GameDbUtil.CreateGameDbContext(userId))
             {
-                var user = context.UserDetails
+                var user = await context.UserDetails
                     .Where(u => u.UserId == userId)
-                    .SingleOrDefault();
+                    .Include(u => u.ReceievedGrantItem.Where(r => grantItemIds.Contains(r.GrantItemId)))
+                    .SingleOrDefaultAsync();
 
-                foreach (var reward in rewards)
+                var excepts = grantItems.Where(r => !user.ReceievedGrantItem.Select(r => r.GrantItemId).Contains(r.Id));
+
+                foreach (var item in excepts)
                 {
-                    if (!user.ReceievedUserRewards.Contains(reward.Id))
+                    user.MailBox.Add(new UserMail()
                     {
-                        user.MailBox.Add(new UserMail()
-                        {
-                            Description = reward.Description,
-                            ExpireTime = reward.ExpireTime,
-                            Items = reward.Items,
-                            Name = reward.Name,
-                        });
-
-                        user.ReceievedUserRewards.Add(reward.Id);
-                    }
+                        Description = item.Description,
+                        ExpireTime = item.ExpireTime,
+                        Items = item.Items,
+                        Name = item.Name,
+                    });
+                    user.ReceievedGrantItem.Add(new ReceievedGrantItem() { GrantItemId = item.Id });
                 }
                 await context.SaveChangesAsync();
             }

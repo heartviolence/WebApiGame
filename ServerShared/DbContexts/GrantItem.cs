@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ServerShared.DbContexts
 {
-    public class UserReward
+    public class GrantItem
     {
         public int Id { get; set; }
         public string Name { get; set; }

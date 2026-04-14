@@ -38,7 +38,7 @@ namespace SampleWebApi.Controllers
             var checkResult = await _repository.GetUserIdFromUsername(request.Username);            
             if (checkResult.isExist)
             {
-                await _repository.UserRewardsToMailBox(checkResult.userId);
+                await _repository.GrantItemToMailBox(checkResult.userId);
                 _logger.LogInformation("유저 로그인성공, username: {Username},userId {UserId}", request.Username, checkResult.userId);
                 return new LoginResponse() { IsSuccess = true, UserId = checkResult.userId, Token = LoginToken(request, checkResult.userId) };
             }

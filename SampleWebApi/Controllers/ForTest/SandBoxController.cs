@@ -49,14 +49,14 @@ namespace SampleWebApi.Controllers.ForTest
         }
 
         [HttpPost]
-        public async Task<ActionResult> AddUserReward()
+        public async Task<ActionResult> AddGrantItem()
         {
             var Items = new List<GameItem>();
             Items.Add(new GameItem() { Name = ItemNames.IAMATOMIC, Count = 1 });
 
             using (var context = new UserAccountDbContext())
             {
-                context.UserRewards.Add(new UserReward()
+                context.GrantItems.Add(new GrantItem()
                 {
                     Name = "아이템증정이벤트",
                     Description = "",
@@ -71,12 +71,12 @@ namespace SampleWebApi.Controllers.ForTest
         }
 
         [HttpDelete]
-        public async Task<ActionResult> DeleteAllUserReward()
+        public async Task<ActionResult> DeleteAllGrantItems()
         {
             using (var context = new UserAccountDbContext())
             {
-                var targets = await context.UserRewards.Include(u => u.Items).ToListAsync();
-                context.UserRewards.RemoveRange(targets);
+                var targets = await context.GrantItems.Include(u => u.Items).ToListAsync();
+                context.GrantItems.RemoveRange(targets);
                 await context.SaveChangesAsync();
             }
 

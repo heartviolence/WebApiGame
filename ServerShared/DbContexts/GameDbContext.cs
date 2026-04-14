@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace ServerShared.DbContexts
 {
@@ -24,7 +26,9 @@ namespace ServerShared.DbContexts
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=UserDB;Trusted_Connection=True");
-            optionsBuilder.UseSqlServer(_connectionString);
+            optionsBuilder.UseSqlServer(_connectionString)
+                .LogTo(Log.Logger.Information, LogLevel.Information)
+                .EnableSensitiveDataLogging(); ;
         }
     }
 }

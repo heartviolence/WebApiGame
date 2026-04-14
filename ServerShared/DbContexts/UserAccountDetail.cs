@@ -35,8 +35,7 @@ namespace ServerShared.DbContexts
         public string? GameState { get; set; }
 
         public List<UserMail> MailBox { get; set; } = new();
-
-        public List<int> ReceievedUserRewards { get; set; } = new();
+        public List<ReceievedGrantItem> ReceievedGrantItem { get; set; } = new();
 
     }
 }
