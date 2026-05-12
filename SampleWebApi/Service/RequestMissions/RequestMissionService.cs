@@ -44,19 +44,13 @@ namespace SampleWebApi.Service.RequestMissions
             return true;
         }
 
-        public bool IsValidMissionCode(IEnumerable<string> dbMissionCodes, string missionCode)
+        public bool IsValidMissionCode(string missionCode)
         {
             if (!_missionProvider.Missions.TryGetValue(missionCode, out var mission))
             {
                 _logger.LogWarning("올바르지않은 의뢰 미션 코드,missionCode:{MissionCode}", missionCode);
                 return false;
-            }
-
-            if (dbMissionCodes.Contains(missionCode))
-            {
-                _logger.LogWarning("이미 존재하는 의뢰 미션코드,missionCode:{MissionCode}", missionCode);
-                return false;
-            }
+            } 
 
             return true;
         }

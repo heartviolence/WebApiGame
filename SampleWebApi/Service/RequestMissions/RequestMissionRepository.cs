@@ -26,10 +26,16 @@ namespace SampleWebApi.Service.RequestMissions
             {
                 var user = await context.UserDetails.Where(u => u.UserId == userId)
                     .Include(u => u.Characters)
-                    .Include(u => u.RequestMissions)
+                    .Include(u => u.RequestMissions.Where(m => m.MissionCode == missionCode))
                     .FirstOrDefaultAsync();
 
-                if (!_service.IsValidMissionCode(user.RequestMissions.Select(m => m.MissionCode), missionCode))
+                if (user.RequestMissions.Count > 0)
+                {
+                    _logger.LogWarning("이미 존재하는 의뢰 미션코드,missionCode:{MissionCode}", missionCode);
+                    return false;
+                }
+
+                if (!_service.IsValidMissionCode(missionCode))
                 {
                     return false;
                 }

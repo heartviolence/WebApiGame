@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Assets.Scripts.Shared.GameDatas;
+using Microsoft.EntityFrameworkCore;
 using ServerShared.DbContexts;
 using ServerShared.Shards;
 
@@ -18,11 +19,11 @@ namespace SampleWebApi.Service.Characters
             {
                 var user = context.UserDetails
                     .Where(u => u.UserId == userId)
-                    .Include(u => u.Characters)
-                    .Include(u => u.GameItems)
+                    .Include(u => u.Characters.Where(c => c.Name == characterName))
+                    .Include(u => u.GameItems.Where(i => i.Name == ItemNames.CharacterLevelUpMaterial))
                     .SingleOrDefault();
 
-                var character = user.Characters.Where(c => c.Name == characterName).SingleOrDefault();
+                var character = user.Characters.SingleOrDefault();
                 if (user == null || character == null)
                 {
                     return null;
@@ -41,11 +42,11 @@ namespace SampleWebApi.Service.Characters
             {
                 var user = context.UserDetails
                     .Where(u => u.UserId == userId)
-                    .Include(u => u.Characters)
-                    .Include(u => u.GameItems)
+                    .Include(u => u.Characters.Where(c => c.Name == characterName))
+                    .Include(u => u.GameItems.Where(i => i.Name == ItemNames.CharacterRankUpMaterial))
                     .SingleOrDefault();
 
-                var character = user.Characters.Where(c => c.Name == characterName).SingleOrDefault();
+                var character = user.Characters.SingleOrDefault();
                 if (user == null || character == null)
                 {
                     return null;
