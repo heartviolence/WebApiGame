@@ -27,6 +27,7 @@ namespace SampleWebApi.Service.Users
                     .Include(u => u.GameItems)
                     .Include(u => u.Records)
                     .Include(u => u.CompletedAchievements)
+                    .AsSplitQuery()
                     .FirstOrDefaultAsync();
             }
         }
