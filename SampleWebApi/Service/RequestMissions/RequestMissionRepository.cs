@@ -51,6 +51,7 @@ namespace SampleWebApi.Service.RequestMissions
                 user.RequestMissions.Add(RequestMission.Create(missionCode));
                 context.GameEvents.Add(RequestMissionStartEvent.Create(userId, missionCode, characterCodes).CovertToGameEvent());
 
+                user.RowVersion = Guid.NewGuid();
                 await context.SaveChangesAsync();
             }
             return true;
@@ -72,6 +73,7 @@ namespace SampleWebApi.Service.RequestMissions
                 }
 
                 context.RequestMissions.RemoveRange(completeMissions);
+                user.RowVersion = Guid.NewGuid();
                 await context.SaveChangesAsync();
             }
         }

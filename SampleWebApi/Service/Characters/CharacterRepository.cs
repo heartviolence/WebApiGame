@@ -29,6 +29,7 @@ namespace SampleWebApi.Service.Characters
                 }
 
                 _service.UseLevelUpItem(user, character, itemCount);
+                user.RowVersion = Guid.NewGuid();
                 await context.SaveChangesAsync();
                 return character;
             }
@@ -51,6 +52,7 @@ namespace SampleWebApi.Service.Characters
                 }
 
                 _service.RankUp(user, character);
+                user.RowVersion = Guid.NewGuid();
                 await context.SaveChangesAsync();
                 return character;
             }

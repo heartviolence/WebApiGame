@@ -41,7 +41,7 @@ namespace SampleWebApi.Controllers.ForTest
                 _gameItemService.AddItem(user, SpeicalItemNames.Crystal, 100);
                 _gameItemService.AddItem(user, ItemNames.CharacterLevelUpMaterial, 10);
                 _gameItemService.AddItem(user, ItemNames.CharacterRankUpMaterial, 10);
-
+                user.RowVersion = Guid.NewGuid();
                 await context.SaveChangesAsync();
             }
 
@@ -81,6 +81,6 @@ namespace SampleWebApi.Controllers.ForTest
             }
 
             return Ok();
-        }
+        } 
     }
 }

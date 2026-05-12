@@ -44,7 +44,7 @@ namespace AchievementWorker
             {
                 await js.CreateStreamAsync(new StreamConfig(name: nameof(UserAccountCreatedEvent), subjects: [$"game.UserAccountCreatedEvent"]));
                 INatsJSConsumer consumer = await js.CreateOrUpdateConsumerAsync(stream: nameof(UserAccountCreatedEvent), new ConsumerConfig("worker1"));
-
+                
                 await foreach (NatsJSMsg<GameEvent> msg in consumer.ConsumeAsync<GameEvent>())
                 {
                     GameEvent data = msg.Data;

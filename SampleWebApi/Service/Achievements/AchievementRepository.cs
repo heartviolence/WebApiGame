@@ -24,6 +24,7 @@ namespace SampleWebApi.Service.Achievements
 
                 var completedAchievment = user.CompletedAchievements.Where(a => a.AchievementName == achievementName).SingleOrDefault();
                 _service.GainAchievementRewards(user, completedAchievment);
+                user.RowVersion = Guid.NewGuid();
                 await context.SaveChangesAsync();
             }
         }

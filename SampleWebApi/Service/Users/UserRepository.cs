@@ -70,6 +70,7 @@ namespace SampleWebApi.Service.Users
                 }
                 userData.Characters.Add(DefaultGameCharacter.Create(gachaEvent.AddCharacterCode));
                 context.GameEvents.Add(gachaEvent.CovertToGameEvent());
+                userData.RowVersion = Guid.NewGuid();
                 await context.SaveChangesAsync();
             }
         }
@@ -140,6 +141,7 @@ namespace SampleWebApi.Service.Users
                     });
                     user.ReceievedGrantItem.Add(new ReceievedGrantItem() { GrantItemId = item.Id });
                 }
+                user.RowVersion = Guid.NewGuid();
                 await context.SaveChangesAsync();
             }
         }

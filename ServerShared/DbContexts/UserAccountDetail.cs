@@ -37,5 +37,7 @@ namespace ServerShared.DbContexts
         public List<UserMail> MailBox { get; set; } = new();
         public List<ReceievedGrantItem> ReceievedGrantItem { get; set; } = new();
 
+        [ConcurrencyCheck]
+        public Guid RowVersion { get; set; } //해당 테이블의 항목 또는 하위 항목을 업데이트 할때마다 값을 변경해야함
     }
 }

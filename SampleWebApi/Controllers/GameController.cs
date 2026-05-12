@@ -38,6 +38,7 @@ namespace SampleWebApi.Controllers
                 gamestate.Start(new List<string> { CharacterNames.Sora, CharacterNames.Nora });
                 user.GameState = Convert.ToBase64String(MessagePackSerializer.Serialize(gamestate));
 
+                user.RowVersion = Guid.NewGuid();
                 await context.SaveChangesAsync();
                 return user.GameState;
             }
@@ -61,6 +62,7 @@ namespace SampleWebApi.Controllers
                 gamestate.SelectNPC(index);
                 user.GameState = Convert.ToBase64String(MessagePackSerializer.Serialize(gamestate));
 
+                user.RowVersion = Guid.NewGuid();
                 await context.SaveChangesAsync();
                 return user.GameState;
             }
@@ -84,6 +86,7 @@ namespace SampleWebApi.Controllers
                 gamestate.SelectCard(index);
                 user.GameState = Convert.ToBase64String(MessagePackSerializer.Serialize(gamestate));
 
+                user.RowVersion = Guid.NewGuid();
                 await context.SaveChangesAsync();
                 return user.GameState;
             }
@@ -106,6 +109,7 @@ namespace SampleWebApi.Controllers
                 gamestate.BuyPowerUp();
                 user.GameState = Convert.ToBase64String(MessagePackSerializer.Serialize(gamestate));
 
+                user.RowVersion = Guid.NewGuid();
                 await context.SaveChangesAsync();
                 return user.GameState;
             }
@@ -129,6 +133,7 @@ namespace SampleWebApi.Controllers
                 gamestate.NextFloor();
                 user.GameState = Convert.ToBase64String(MessagePackSerializer.Serialize(gamestate));
 
+                user.RowVersion = Guid.NewGuid();
                 await context.SaveChangesAsync();
                 return user.GameState;
             }
@@ -152,6 +157,7 @@ namespace SampleWebApi.Controllers
                 gamestate.BattleEnd();
                 user.GameState = Convert.ToBase64String(MessagePackSerializer.Serialize(gamestate));
 
+                user.RowVersion = Guid.NewGuid();
                 await context.SaveChangesAsync();
                 return user.GameState;
             }
