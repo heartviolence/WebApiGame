@@ -38,7 +38,7 @@ namespace SampleWebApi.Controllers.ForTest
                     .Include(u => u.GameItems)
                     .SingleOrDefault();
 
-                _gameItemService.AddItem(user, SpeicalItemNames.Crystal, 100);
+                _gameItemService.AddItem(user, SpecialItemNames.Crystal, 100);
                 _gameItemService.AddItem(user, ItemNames.CharacterLevelUpMaterial, 10);
                 _gameItemService.AddItem(user, ItemNames.CharacterRankUpMaterial, 10);
                 user.RowVersion = Guid.NewGuid();

@@ -5,18 +5,22 @@ using System.Text;
 
 namespace ServerShared.Events
 {
-    public class UserAccountDetailCreatedEvent
+    public class GainAcheivementRewardsEvent : IGameEvent
     {
-        public string Username { get; set; } = string.Empty;
         public int UserId { get; set; }
+        public string AchievementName { get; set; }
+        public int Level { get; set; }
+        public int BeforeRewardCheckPoint { get; set; }
+        public int AfterRewardCheckPoint { get; set; }
 
-        public int ShardNumber { get; set; }
+        public List<GameItem> Rewards { get; set; } = new();
+
         public GameEvent CovertToGameEvent()
         {
             return new GameEvent
             {
                 UserId = UserId,
-                EventType = nameof(UserAccountDetailCreatedEvent),
+                EventType = nameof(GainAcheivementRewardsEvent),
                 Payload = System.Text.Json.JsonSerializer.Serialize(this),
                 EventVersion = ServerVersion.Version,
             };

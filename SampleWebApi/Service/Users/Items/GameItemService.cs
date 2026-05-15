@@ -29,7 +29,7 @@ namespace SampleWebApi.Service.Users.Items
         {
             switch (itemName)
             {
-                case SpeicalItemNames.Crystal:
+                case SpecialItemNames.Crystal:
                     user.Crystal += count;
                     return true;
                 default:

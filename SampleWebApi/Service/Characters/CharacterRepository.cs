@@ -29,7 +29,8 @@ namespace SampleWebApi.Service.Characters
                     return null;
                 }
 
-                _service.UseLevelUpItem(user, character, itemCount);
+                var gameEvent = _service.UseLevelUpItem(user, character, itemCount);
+                context.GameEvents.Add(gameEvent.CovertToGameEvent());
                 user.RowVersion = Guid.NewGuid();
                 await context.SaveChangesAsync();
                 return character;
@@ -52,7 +53,8 @@ namespace SampleWebApi.Service.Characters
                     return null;
                 }
 
-                _service.RankUp(user, character);
+                var gameEvent = _service.RankUp(user, character);
+                context.GameEvents.Add(gameEvent.CovertToGameEvent());
                 user.RowVersion = Guid.NewGuid();
                 await context.SaveChangesAsync();
                 return character;

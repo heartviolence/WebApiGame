@@ -1,8 +1,8 @@
 ﻿using SampleWebApi.Model.Characters;
-using SampleWebApi.Model.Items; 
+using SampleWebApi.Model.Items;
 using SampleWebApi.Service.Characters;
 using ServerShared.DbContexts;
-using ServerShared.Events; 
+using ServerShared.Events;
 
 namespace SampleWebApi.Service.RequestMissions
 {
@@ -50,7 +50,7 @@ namespace SampleWebApi.Service.RequestMissions
             {
                 _logger.LogWarning("올바르지않은 의뢰 미션 코드,missionCode:{MissionCode}", missionCode);
                 return false;
-            } 
+            }
 
             return true;
         }
@@ -98,16 +98,17 @@ namespace SampleWebApi.Service.RequestMissions
             {
                 switch (reward.ItemCode)
                 {
-                    case SpeicalItemNames.Crystal:
+                    case SpecialItemNames.Crystal:
                         int beforeCrystal = userData.Crystal;
                         userData.Crystal += reward.MinCount;
                         _logger.LogInformation("User의 크리스탈+{Crystal},적용후+{CrystalCurrent}", reward.MinCount, userData.Crystal);
                         events.Add(new GetMissionRewardEvent()
                         {
                             UserId = userData.UserId,
+                            CompletedMissionCode = completedMissionCode,
                             ItemCode = reward.ItemCode,
                             BeforeItemCount = beforeCrystal,
-                            AeforeItemCount = userData.Crystal
+                            AfterItemCount = userData.Crystal
                         });
                         break;
                     default:

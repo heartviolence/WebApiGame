@@ -17,7 +17,7 @@ namespace SampleWebApi.Model.RequestMissions
         {
             return new MissionReward
             {
-                ItemCode = SpeicalItemNames.Crystal,
+                ItemCode = SpecialItemNames.Crystal,
                 MinCount = count,
             };
         }

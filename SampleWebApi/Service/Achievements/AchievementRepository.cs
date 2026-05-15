@@ -23,7 +23,12 @@ namespace SampleWebApi.Service.Achievements
                     .SingleOrDefault();
 
                 var completedAchievment = user.CompletedAchievements.Where(a => a.AchievementName == achievementName).SingleOrDefault();
-                _service.GainAchievementRewards(user, completedAchievment);
+                var gameEvent = _service.GainAchievementRewards(user, completedAchievment);
+                if (gameEvent == null)
+                {
+                    return;
+                }
+                context.GameEvents.Add(gameEvent.CovertToGameEvent());
                 user.RowVersion = Guid.NewGuid();
                 await context.SaveChangesAsync();
             }

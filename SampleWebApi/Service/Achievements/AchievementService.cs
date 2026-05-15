@@ -2,6 +2,7 @@
 using SampleWebApi.Model.Items;
 using SampleWebApi.Service.Users.Items;
 using ServerShared.DbContexts;
+using ServerShared.Events;
 
 namespace SampleWebApi.Service.Achievements
 {
@@ -13,25 +14,34 @@ namespace SampleWebApi.Service.Achievements
             this._itemService = itemService;
         }
 
-        public void GainAchievementRewards(UserAccountDetail user, CompletedAchievement completedAchievement)
+        public GainAcheivementRewardsEvent? GainAchievementRewards(UserAccountDetail user, CompletedAchievement completedAchievement)
         {
             if (completedAchievement is null ||
                 completedAchievement.Level <= completedAchievement.RewardCheckPoint)
             {
-                return;
+                return null;
             }
 
             var rewards = GetAchievementRewards(completedAchievement.AchievementName, completedAchievement.RewardCheckPoint + 1);
             foreach (var reward in rewards)
             {
-                _itemService.AddItem(user, reward.itemName, reward.count);
+                _itemService.AddItem(user, reward.Name, reward.Count);
             }
             completedAchievement.RewardCheckPoint += 1;
+            return new GainAcheivementRewardsEvent
+            {
+                UserId = user.UserId,
+                AchievementName = completedAchievement.AchievementName,
+                Level = completedAchievement.Level,
+                BeforeRewardCheckPoint = completedAchievement.RewardCheckPoint - 1,
+                AfterRewardCheckPoint = completedAchievement.RewardCheckPoint,
+                Rewards = rewards
+            };
         }
 
-        List<(string itemName, int count)> GetAchievementRewards(string achievementCode, int level)
+        List<GameItem> GetAchievementRewards(string achievementCode, int level)
         {
-            return new() { new(SpeicalItemNames.Crystal, 1) };
+            return new() { new GameItem() { Id = -1, Name = SpecialItemNames.Crystal, Count = 1 } };
         }
     }
 }

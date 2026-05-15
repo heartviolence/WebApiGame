@@ -91,7 +91,7 @@ namespace SampleWebApi.Controllers
                 return BadRequest();
             }
 
-            await _repository.Gacha(userId);
+            await _repository.CharacterGacha(userId);
             _logger.LogInformation("캐릭터 추가 성공 userId:{UserId}", userId);
             return Ok();
         }        

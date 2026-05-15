@@ -1,5 +1,6 @@
 ﻿using Assets.Scripts.Shared.GameDatas;
 using ServerShared.DbContexts;
+using ServerShared.Events;
 
 namespace SampleWebApi.Service.Characters
 {
@@ -10,35 +11,68 @@ namespace SampleWebApi.Service.Characters
 
         }
 
-        public void UseLevelUpItem(UserAccountDetail user, GameCharacter character, int itemCount)
+        public UseLevelUpItemEvent UseLevelUpItem(UserAccountDetail user, GameCharacter character, int itemCount)
         {
             var item = user.GameItems.Where(i => i.Name == ItemNames.CharacterLevelUpMaterial).SingleOrDefault();
             if (item == null || item.Count < itemCount)
             {
-                return;
+                return null;
             }
+
+            var modifiedItemCountInfo = new ModifiedItemCountInfo
+            {
+                ItemName = item.Name,
+                BeforeCount = item.Count
+            };
+
             character.EXP += itemCount * 100;
             var surplus = ProcessLevelUp(character);
 
             int surplusItemCount = surplus / 100;
             item.Count = item.Count - itemCount + surplusItemCount;
+
+
+            modifiedItemCountInfo.AfterCount = item.Count;
+            return new UseLevelUpItemEvent
+            {
+                UserId = user.UserId,
+                CharacterName = character.Name,
+                ModifiedItemCountInfo = new List<ModifiedItemCountInfo> { modifiedItemCountInfo }
+            };
         }
 
-        public void RankUp(UserAccountDetail user, GameCharacter character)
+        public CharacterRankUpEvent RankUp(UserAccountDetail user, GameCharacter character)
         {
             if (character.Rank == MaxRank() ||
                 IsRankLimit(character.Rank, character.Level) == false)
             {
-                return;
+                return null;
             }
             var item = user.GameItems.Where(i => i.Name == ItemNames.CharacterRankUpMaterial).SingleOrDefault();
             var requireItemCount = GetRequireRankUpItemCount(character.Rank);
             if (item == null || item.Count < requireItemCount)
             {
-                return;
+                return null;
             }
             character.Rank += 1;
+
+            var modifiedItemCountInfo = new ModifiedItemCountInfo
+            {
+                ItemName = item.Name,
+                BeforeCount = item.Count,
+                AfterCount = item.Count - requireItemCount
+            };
             item.Count -= requireItemCount;
+
+            var gameEvent = new CharacterRankUpEvent
+            {
+                UserId = user.UserId,
+                CharacterName = character.Name,
+                BeforeRank = character.Rank - 1,
+                AfterRank = character.Rank,
+                ModifiedItemCountInfo = new List<ModifiedItemCountInfo> { modifiedItemCountInfo }
+            };
+            return gameEvent;
         }
 
         int ProcessLevelUp(GameCharacter character)

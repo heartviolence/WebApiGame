@@ -1,16 +1,21 @@
 ﻿using ServerShared.DbContexts;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace ServerShared.Events
 {
-    public class UserAccountCreatedEvent : IGameEvent
+    public class GrantItemToMailBoxEvent : IGameEvent
     {
-        public string Username { get; set; } = string.Empty;
+        public int UserId { get; set; }
+
+        public List<GrantItem> ReceievedItems { get; set; } = new();
         public GameEvent CovertToGameEvent()
         {
             return new GameEvent
             {
-                UserId = -1,
-                EventType = nameof(UserAccountCreatedEvent),
+                UserId = UserId,
+                EventType = nameof(GrantItemToMailBoxEvent),
                 Payload = System.Text.Json.JsonSerializer.Serialize(this),
                 EventVersion = ServerVersion.Version,
             };

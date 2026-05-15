@@ -45,7 +45,23 @@ namespace SampleWebApi.Service.Users
             }
         }
 
-        public async Task Gacha(int userId)
+        public async Task<(bool isExist, int userId)> GetUserIdFromUsername(string username)
+        {
+            using (var context = new UserAccountDbContext())
+            {
+                var user = await context.UserAccounts
+                    .Where(u => u.Username == username)
+                    .FirstOrDefaultAsync();
+
+                if (user != null)
+                {
+                    return (true, user.UserId);
+                }
+            }
+            return (false, -1);
+        }
+
+        public async Task CharacterGacha(int userId)
         {
             await using (var context = await GameDbUtil.CreateGameDbContext(userId))
             {
@@ -57,24 +73,116 @@ namespace SampleWebApi.Service.Users
                 {
                     throw new Exception("User not found");
                 }
-
+                var beforeGachaCrystal = userData.Crystal;
                 if (!PayGachaCrystal(userData))
                 {
                     return;
                 }
+                var afterGachaCrystal = userData.Crystal;
                 var characterCodes = userData.Characters.Select(c => c.Name).ToList();
 
-                var gachaEvent = CreateGachaEvent(userId, characterCodes);
-                if (string.IsNullOrEmpty(gachaEvent.AddCharacterCode))
+                var otherOne = CharacterGachaOtherOne(characterCodes);
+                if (string.IsNullOrEmpty(otherOne))
                 {
                     return;
                 }
-                userData.Characters.Add(DefaultGameCharacter.Create(gachaEvent.AddCharacterCode));
+
+                var gachaEvent = new CharacterGachaEvent()
+                {
+                    UserId = userId,
+                    AddCharacterCode = otherOne,
+                    BeforeCrystal = beforeGachaCrystal,
+                    AfterCrystal = afterGachaCrystal,
+                };
+
+                userData.Characters.Add(DefaultGameCharacter.Create(otherOne));
                 context.GameEvents.Add(gachaEvent.CovertToGameEvent());
                 userData.RowVersion = Guid.NewGuid();
                 await context.SaveChangesAsync();
             }
         }
+
+        public async Task GrantItemToMailBox(int userId)
+        {
+            List<GrantItem> grantItems;
+            using (var rewardContext = new UserAccountDbContext())
+            {
+                grantItems = await rewardContext.GrantItems.Where(reward => reward.ExpireTime > DateTime.Now).ToListAsync();
+                if (grantItems.Count == 0)
+                {
+                    return;
+                }
+            }
+
+            var grantItemIds = grantItems.Select(r => r.Id).ToList();
+            await using (var context = await GameDbUtil.CreateGameDbContext(userId))
+            {
+                var user = await context.UserDetails
+                    .Where(u => u.UserId == userId)
+                    .Include(u => u.ReceievedGrantItem.Where(r => grantItemIds.Contains(r.GrantItemId)))
+                    .SingleOrDefaultAsync();
+
+                var excepts = grantItems.Where(r => !user.ReceievedGrantItem.Select(r => r.GrantItemId).Contains(r.Id));
+                if (excepts.Count() == 0)
+                {
+                    return;
+                }
+
+                var gameEvent = new GrantItemToMailBoxEvent()
+                {
+                    UserId = userId
+                };
+
+                foreach (var item in excepts)
+                {
+                    user.MailBox.Add(new UserMail()
+                    {
+                        Description = item.Description,
+                        ExpireTime = item.ExpireTime,
+                        Items = item.Items,
+                        Name = item.Name,
+                    });
+                    user.ReceievedGrantItem.Add(new ReceievedGrantItem() { GrantItemId = item.Id });
+                    gameEvent.ReceievedItems.Add(item);
+                }
+
+                user.RowVersion = Guid.NewGuid();
+                context.GameEvents.Add(gameEvent.CovertToGameEvent());
+                await context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<bool> RegisterNewUser(string username, string password)
+        {
+            using (var context = new UserAccountDbContext())
+            {
+                var userExist = await context.UserAccounts
+                    .Where(u => u.Username == username)
+                    .CountAsync();
+
+                if (userExist > 0)
+                {
+                    return false;
+                }
+
+                var user = new UserAccount()
+                {
+                    Username = username,
+                    Password = password
+                };
+
+                var userCreateEvent = new UserAccountCreatedEvent()
+                {
+                    Username = username
+                };
+                context.UserAccounts.Add(user);
+                context.GameEvents.Add(userCreateEvent.CovertToGameEvent());
+                await context.SaveChangesAsync();
+            }
+            return true;
+        }
+
+        #region Helper
 
         bool PayGachaCrystal(UserAccountDetail user)
         {
@@ -100,102 +208,6 @@ namespace SampleWebApi.Service.Users
             var gachaNumber = (int)random.NextInt64(0, complement.Count - 1);
             return complement[gachaNumber];
         }
-
-        CharacterGachaEvent CreateGachaEvent(int userId, IEnumerable<string> characterCodes)
-        {
-            return new CharacterGachaEvent()
-            {
-                UserId = userId,
-                AddCharacterCode = CharacterGachaOtherOne(characterCodes)
-            };
-        }
-        public async Task GrantItemToMailBox(int userId)
-        {
-            List<GrantItem> grantItems;
-            using (var rewardContext = new UserAccountDbContext())
-            {
-                grantItems = await rewardContext.GrantItems.Where(reward => reward.ExpireTime > DateTime.Now).ToListAsync();
-                if (grantItems.Count == 0)
-                {
-                    return;
-                }
-            }
-
-            var grantItemIds = grantItems.Select(r => r.Id).ToList();
-            await using (var context = await GameDbUtil.CreateGameDbContext(userId))
-            {
-                var user = await context.UserDetails
-                    .Where(u => u.UserId == userId)
-                    .Include(u => u.ReceievedGrantItem.Where(r => grantItemIds.Contains(r.GrantItemId)))
-                    .SingleOrDefaultAsync();
-
-                var excepts = grantItems.Where(r => !user.ReceievedGrantItem.Select(r => r.GrantItemId).Contains(r.Id));
-
-                foreach (var item in excepts)
-                {
-                    user.MailBox.Add(new UserMail()
-                    {
-                        Description = item.Description,
-                        ExpireTime = item.ExpireTime,
-                        Items = item.Items,
-                        Name = item.Name,
-                    });
-                    user.ReceievedGrantItem.Add(new ReceievedGrantItem() { GrantItemId = item.Id });
-                }
-                user.RowVersion = Guid.NewGuid();
-                await context.SaveChangesAsync();
-            }
-        }
-
-        public async Task<(bool isExist, int userId)> GetUserIdFromUsername(string username)
-        {
-            using (var context = new UserAccountDbContext())
-            {
-                var user = await context.UserAccounts
-                    .Where(u => u.Username == username)
-                    .FirstOrDefaultAsync();
-
-                if (user != null)
-                {
-                    return (true, user.UserId);
-                }
-            }
-            return (false, -1);
-        }
-
-        public async Task<bool> RegisterNewUser(string username, string password)
-        {
-            using (var context = new UserAccountDbContext())
-            {
-                var userExist = await context.UserAccounts
-                    .Where(u => u.Username == username)
-                    .CountAsync();
-
-                if (userExist > 0)
-                {
-                    return false;
-                }
-
-                var user = new UserAccount()
-                {
-                    Username = username,
-                    Password = password
-                };
-
-                var userCreateEvent = Create_UserCreateEvent(username);
-                context.UserAccounts.Add(user);
-                context.GameEvents.Add(userCreateEvent.CovertToGameEvent());
-                await context.SaveChangesAsync();
-            }
-            return true;
-        }
-
-        UserAccountCreatedEvent Create_UserCreateEvent(string username)
-        {
-            return new UserAccountCreatedEvent()
-            {
-                Username = username
-            };
-        }
+        #endregion
     }
 }

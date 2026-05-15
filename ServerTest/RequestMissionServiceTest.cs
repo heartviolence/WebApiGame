@@ -63,12 +63,12 @@ namespace ServerTest
         [TestCase("00-00-03", ExpectedResult = false)]
         public bool IsValidMissionCode(string missionCode)
         {
-            List<string> testDbData = new()
-            {
-                "00-00-02"
-            };
+            //List<string> testDbData = new()
+            //{
+            //    "00-00-02"
+            //};
 
-            return _requestMissionService.IsValidMissionCode(testDbData, missionCode);
+            return _requestMissionService.IsValidMissionCode(missionCode);
         }
 
         [Test]
@@ -83,9 +83,10 @@ namespace ServerTest
 
             Assert.That(userInfo.Crystal == 100);
             Assert.That(createdEvents.Count == 1);
-            Assert.That(createdEvents[0].ItemCode == SpeicalItemNames.Crystal);
+            Assert.That(createdEvents[0].ItemCode == SpecialItemNames.Crystal);
+            Assert.That(createdEvents[0].CompletedMissionCode == "00-00-01");
             Assert.That(createdEvents[0].BeforeItemCount == 0);
-            Assert.That(createdEvents[0].AeforeItemCount == 100);
+            Assert.That(createdEvents[0].AfterItemCount == 100);
         }
     }
 
