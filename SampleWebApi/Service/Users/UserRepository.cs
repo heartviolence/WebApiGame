@@ -23,10 +23,13 @@ namespace SampleWebApi.Service.Users
                 return await context.UserDetails
                     .Where(u => u.UserId == userId)
                     .Include(u => u.Characters)
+                    .Include(u => u.AchievementData)
                     .Include(u => u.RequestMissions)
                     .Include(u => u.GameItems)
                     .Include(u => u.Records)
                     .Include(u => u.CompletedAchievements)
+                    .Include(u => u.MailBox)
+                    .Include(u => u.ReceievedGrantItem)
                     .AsSplitQuery()
                     .FirstOrDefaultAsync();
             }
@@ -180,6 +183,39 @@ namespace SampleWebApi.Service.Users
                 await context.SaveChangesAsync();
             }
             return true;
+        }
+
+        public async Task<UserAccountDetail> SnapShotData(int userId)
+        {
+            using (var context = await GameDbUtil.CreateGameDbContext(userId))
+            {
+                var userData = await context.UserDetails
+                    .Where(u => u.UserId == userId)
+                    .Include(u => u.Characters)
+                    .Include(u => u.RequestMissions)
+                    .Include(u => u.CompletedAchievements)
+                    .Include(u => u.AchievementData)
+                    .Include(u => u.GameItems)
+                    .Include(u => u.Records)
+                    .Include(u => u.MailBox)
+                    .Include(u => u.ReceievedGrantItem)
+                    .AsSplitQuery()
+                    .SingleOrDefaultAsync();
+
+                if (userData == null)
+                {
+                    throw new Exception("User not found");
+                }
+
+                var snapShotEvent = new UserSnapshotEvent()
+                {
+                    UserData = userData
+                };
+                context.GameEvents.Add(snapShotEvent.CovertToGameEvent());
+                userData.RowVersion = Guid.NewGuid();
+                await context.SaveChangesAsync();
+                return userData;
+            }
         }
 
         #region Helper
