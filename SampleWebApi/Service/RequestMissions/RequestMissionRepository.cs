@@ -54,9 +54,15 @@ namespace SampleWebApi.Service.RequestMissions
                     return false;
                 }
 
-                user.RequestMissions.Add(RequestMission.Create(missionCode));
-                context.GameEvents.Add(RequestMissionStartEvent.Create(userId, missionCode, characterCodes).CovertToGameEvent());
-
+                var gameEvent = new RequestMissionStartEvent()
+                {
+                    UserId = userId,
+                    MissionCode = missionCode,
+                    StartTime = DateTime.Now,
+                    CharacterCodes = characterCodes,
+                };
+                _service.PlayRequestMissionStartEvent(user, gameEvent);
+                context.GameEvents.Add(gameEvent.CovertToGameEvent());
                 user.RowVersion = Guid.NewGuid();
                 await context.SaveChangesAsync();
             }
@@ -69,16 +75,17 @@ namespace SampleWebApi.Service.RequestMissions
             {
                 var user = await context.UserDetails.Where(u => u.UserId == userId)
                     .Include(u => u.RequestMissions)
+                    .Include(u => u.GameItems)
                     .FirstOrDefaultAsync();
 
-                var completeMissions = user.RequestMissions.Where(m => _service.IsMissionComplete(m));
+                var completeMissions = user.RequestMissions.Where(m => _service.IsMissionComplete(m)).ToList();
                 foreach (var mission in completeMissions)
                 {
-                    var events = _service.ProcessCompleteMission(user, mission.MissionCode);
-                    context.GameEvents.AddRange(events.ConvertAll(e => e.CovertToGameEvent()));
+                    var gameEvent = _service.ProcessCompleteMission(user, mission.MissionCode);
+                    var convert = gameEvent.CovertToGameEvent();
+                    context.GameEvents.Add(convert);
                 }
 
-                context.RequestMissions.RemoveRange(completeMissions);
                 user.RowVersion = Guid.NewGuid();
                 await context.SaveChangesAsync();
             }

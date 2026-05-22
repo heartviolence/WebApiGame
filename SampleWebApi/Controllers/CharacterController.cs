@@ -29,6 +29,11 @@ namespace SampleWebApi.Controllers
             }
 
             var characterData = await _repository.UseLevelUpItem(userId, characterName, itemCount);
+            if (characterData == null)
+            {
+                return null;
+            }
+
             return DTOConverter.DTO(characterData);
         }
 

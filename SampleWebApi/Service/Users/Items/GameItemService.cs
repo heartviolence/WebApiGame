@@ -1,5 +1,4 @@
-﻿using SampleWebApi.Model.Items;
-using ServerShared.DbContexts; 
+﻿using ServerShared.DbContexts;
 
 namespace SampleWebApi.Service.Users.Items
 {
@@ -9,34 +8,17 @@ namespace SampleWebApi.Service.Users.Items
         {
         }
 
-        public void AddItem(UserAccountDetail user, string itemName, int count)
+        public int AddItem(UserAccountDetail user, string itemName, int count)
         {
-            if (ProcessSpecialItem(user, itemName, count))
-            {
-                return;
-            }
             var item = user.GameItems.Find(u => u.Name == itemName);
             if (item == null)
             {
                 user.GameItems.Add(new GameItem { Name = itemName, Count = count });
-                return;
+                return 0;
             }
-
+            var beforeItemCount = item.Count;
             item.Count += count;
-        }
-
-        bool ProcessSpecialItem(UserAccountDetail user, string itemName, int count)
-        {
-            switch (itemName)
-            {
-                case SpecialItemNames.Crystal:
-                    user.Crystal += count;
-                    return true;
-                default:
-                    break;
-            }
-
-            return false;
+            return beforeItemCount;
         }
     }
 }

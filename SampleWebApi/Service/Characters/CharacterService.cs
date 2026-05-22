@@ -31,14 +31,27 @@ namespace SampleWebApi.Service.Characters
             int surplusItemCount = surplus / 100;
             item.Count = item.Count - itemCount + surplusItemCount;
 
-
             modifiedItemCountInfo.AfterCount = item.Count;
             return new UseLevelUpItemEvent
             {
                 UserId = user.UserId,
                 CharacterName = character.Name,
+                CharacterLevel = character.Level,
+                CharacterEXP = character.EXP,
                 ModifiedItemCountInfo = new List<ModifiedItemCountInfo> { modifiedItemCountInfo }
             };
+        }
+
+        public void PlayUseLevelUpItemEvent(UserAccountDetail user, UseLevelUpItemEvent e)
+        {
+            var character = user.Characters.Where(c => c.Name == e.CharacterName).First();
+            character.Level = e.CharacterLevel;
+            character.EXP = e.CharacterEXP;
+            foreach (var modifiedItem in e.ModifiedItemCountInfo)
+            {
+                var gameItem = user.GameItems.Where(i => i.Name == modifiedItem.ItemName).First();
+                gameItem.Count = modifiedItem.AfterCount;
+            }
         }
 
         public CharacterRankUpEvent RankUp(UserAccountDetail user, GameCharacter character)
@@ -74,6 +87,18 @@ namespace SampleWebApi.Service.Characters
             };
             return gameEvent;
         }
+
+        public void PlayCharacterRankUpEvent(UserAccountDetail user, CharacterRankUpEvent e)
+        {
+            var character = user.Characters.Where(c => c.Name == e.CharacterName).SingleOrDefault();
+            character.Rank = e.AfterRank;
+            foreach (var itemInfo in e.ModifiedItemCountInfo)
+            {
+                var item = user.GameItems.Where(i => i.Name == itemInfo.ItemName).Single();
+                item.Count = itemInfo.AfterCount;
+            }
+        }
+
 
         int ProcessLevelUp(GameCharacter character)
         {

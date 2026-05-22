@@ -1,19 +1,20 @@
 ﻿using ServerShared.DbContexts;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace ServerShared.Events
+namespace ServerShared.Events.SandBox
 {
-    public class RequestMissionStartEvent : IGameEvent
+    public class ShowMetheMoneyEvent : IGameEvent
     {
         public int UserId { get; set; }
-        public string MissionCode { get; set; }
-        public DateTime StartTime { get; set; }
-        public List<string> CharacterCodes { get; set; } = new();
+        public List<ModifiedItemCountInfo> ModifiedItems { get; set; } = new();
         public GameEvent CovertToGameEvent()
         {
             return new GameEvent
             {
-                UserId = UserId,
-                EventType = nameof(RequestMissionStartEvent),
+                UserId = this.UserId,
+                EventType = nameof(ShowMetheMoneyEvent),
                 Payload = System.Text.Json.JsonSerializer.Serialize(this),
                 EventVersion = ServerVersion.Version,
             };

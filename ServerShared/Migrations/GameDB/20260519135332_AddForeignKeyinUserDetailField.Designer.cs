@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ServerShared.DbContexts;
 
@@ -11,9 +12,11 @@ using ServerShared.DbContexts;
 namespace ServerShared.Migrations.GameDB
 {
     [DbContext(typeof(GameDbContext))]
-    partial class GameDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260519135332_AddForeignKeyinUserDetailField")]
+    partial class AddForeignKeyinUserDetailField
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -168,7 +171,7 @@ namespace ServerShared.Migrations.GameDB
 
                     b.HasIndex("UserMailId");
 
-                    b.ToTable("GameItems");
+                    b.ToTable("GameItem");
                 });
 
             modelBuilder.Entity("ServerShared.DbContexts.ReceievedGrantItem", b =>

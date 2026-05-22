@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Assets.Scripts.Shared.GameDatas;
+using Microsoft.EntityFrameworkCore;
 using SampleWebApi.Model.Characters;
 using SampleWebApi.Service.Characters;
 using ServerShared.DbContexts;
 using ServerShared.Events;
 using ServerShared.Shards;
+using ServerShared.Util;
 
 namespace SampleWebApi.Service.Users
 {
@@ -11,9 +13,11 @@ namespace SampleWebApi.Service.Users
     {
         Random random = new();
         IGameCharacterDataProvider _gameCharacterData;
-        public UserRepository(IGameCharacterDataProvider gameCharacterData)
+        ILogger _logger;
+        public UserRepository(IGameCharacterDataProvider gameCharacterData, ILogger<UserRepository> logger)
         {
             this._gameCharacterData = gameCharacterData;
+            _logger = logger;
         }
 
         public async Task<UserAccountDetail> GetUserInfo(int userId)
@@ -29,6 +33,7 @@ namespace SampleWebApi.Service.Users
                     .Include(u => u.Records)
                     .Include(u => u.CompletedAchievements)
                     .Include(u => u.MailBox)
+                    .ThenInclude(m => m.Items)
                     .Include(u => u.ReceievedGrantItem)
                     .AsSplitQuery()
                     .FirstOrDefaultAsync();
@@ -64,38 +69,41 @@ namespace SampleWebApi.Service.Users
             return (false, -1);
         }
 
-        public async Task CharacterGacha(int userId)
+        public async Task<int> CharacterGacha(int userId)
         {
             await using (var context = await GameDbUtil.CreateGameDbContext(userId))
             {
                 var userData = await context.UserDetails
                     .Include(u => u.Characters)
+                    .Include(u => u.GameItems.Where(i => i.Name == ItemNames.Crystal))
                     .FirstOrDefaultAsync(u => u.UserId == userId);
 
                 if (userData == null)
                 {
                     throw new Exception("User not found");
                 }
-                var beforeGachaCrystal = userData.Crystal;
+                var beforeGachaCrystal = userData.Crystal();
                 if (!PayGachaCrystal(userData))
                 {
-                    return;
+                    _logger.LogInformation("Gacha처리 실패,크리스탈부족");
+                    return 1;
                 }
-                var afterGachaCrystal = userData.Crystal;
+                var afterGachaCrystal = userData.Crystal();
                 var characterCodes = userData.Characters.Select(c => c.Name).ToList();
 
                 var otherOne = CharacterGachaOtherOne(characterCodes);
                 if (string.IsNullOrEmpty(otherOne))
                 {
-                    return;
+                    _logger.LogInformation("Gacha처리 실패,모든캐릭보유중");
+                    return 2;
                 }
 
                 var gachaEvent = new CharacterGachaEvent()
                 {
                     UserId = userId,
                     AddCharacterCode = otherOne,
-                    BeforeCrystal = beforeGachaCrystal,
-                    AfterCrystal = afterGachaCrystal,
+                    BeforeCrystal = beforeGachaCrystal.Count,
+                    AfterCrystal = afterGachaCrystal.Count,
                 };
 
                 userData.Characters.Add(DefaultGameCharacter.Create(otherOne));
@@ -103,6 +111,7 @@ namespace SampleWebApi.Service.Users
                 userData.RowVersion = Guid.NewGuid();
                 await context.SaveChangesAsync();
             }
+            return 0;
         }
 
         public async Task GrantItemToMailBox(int userId)
@@ -110,7 +119,10 @@ namespace SampleWebApi.Service.Users
             List<GrantItem> grantItems;
             using (var rewardContext = new UserAccountDbContext())
             {
-                grantItems = await rewardContext.GrantItems.Where(reward => reward.ExpireTime > DateTime.Now).ToListAsync();
+                grantItems = await rewardContext.GrantItems
+                    .Where(i => i.ExpireTime > DateTime.Now)
+                    .Include(i => i.Items)
+                    .ToListAsync();
                 if (grantItems.Count == 0)
                 {
                     return;
@@ -125,7 +137,7 @@ namespace SampleWebApi.Service.Users
                     .Include(u => u.ReceievedGrantItem.Where(r => grantItemIds.Contains(r.GrantItemId)))
                     .SingleOrDefaultAsync();
 
-                var excepts = grantItems.Where(r => !user.ReceievedGrantItem.Select(r => r.GrantItemId).Contains(r.Id));
+                var excepts = grantItems.Where(r => !user.ReceievedGrantItem.Select(r => r.GrantItemId).Contains(r.Id)).ToList();
                 if (excepts.Count() == 0)
                 {
                     return;
@@ -138,20 +150,30 @@ namespace SampleWebApi.Service.Users
 
                 foreach (var item in excepts)
                 {
-                    user.MailBox.Add(new UserMail()
-                    {
-                        Description = item.Description,
-                        ExpireTime = item.ExpireTime,
-                        Items = item.Items,
-                        Name = item.Name,
-                    });
-                    user.ReceievedGrantItem.Add(new ReceievedGrantItem() { GrantItemId = item.Id });
+                    item.Items.ForEach(i => i.Id = 0);
                     gameEvent.ReceievedItems.Add(item);
                 }
+
+                PlayGrantItemToMailBoxEvent(user, gameEvent);
 
                 user.RowVersion = Guid.NewGuid();
                 context.GameEvents.Add(gameEvent.CovertToGameEvent());
                 await context.SaveChangesAsync();
+            }
+        }
+
+        public void PlayGrantItemToMailBoxEvent(UserAccountDetail user, GrantItemToMailBoxEvent e)
+        {
+            foreach (var item in e.ReceievedItems)
+            {
+                user.ReceievedGrantItem.Add(new ReceievedGrantItem() { GrantItemId = item.Id });
+                user.MailBox.Add(new UserMail()
+                {
+                    Description = item.Description,
+                    ExpireTime = item.ExpireTime,
+                    Items = item.Items,
+                    Name = item.Name,
+                });
             }
         }
 
@@ -198,6 +220,7 @@ namespace SampleWebApi.Service.Users
                     .Include(u => u.GameItems)
                     .Include(u => u.Records)
                     .Include(u => u.MailBox)
+                    .ThenInclude(m => m.Items)
                     .Include(u => u.ReceievedGrantItem)
                     .AsSplitQuery()
                     .SingleOrDefaultAsync();
@@ -222,12 +245,13 @@ namespace SampleWebApi.Service.Users
 
         bool PayGachaCrystal(UserAccountDetail user)
         {
+            var crystal = user.Crystal();
             int gachaPay = 10;
-            if (user.Crystal < gachaPay)
+            if (crystal.Count < gachaPay)
             {
                 return false;
             }
-            user.Crystal -= gachaPay;
+            crystal.Count -= gachaPay;
             return true;
         }
 

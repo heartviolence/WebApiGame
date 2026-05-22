@@ -6,6 +6,7 @@ namespace Assets.Scripts.Shared.GameDatas
 {
     public class ItemNames
     {
+        public const string Crystal = "Crystal";
         public const string CharacterLevelUpMaterial = "CharacterLevelUpMaterial";
         public const string CharacterRankUpMaterial = "CharacterRankUpMaterial";
         public const string IAMATOMIC = "IAMATOMIC";

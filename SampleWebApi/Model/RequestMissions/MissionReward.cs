@@ -1,10 +1,10 @@
-﻿using SampleWebApi.Model.Items;
+﻿using Assets.Scripts.Shared.GameDatas;
 
 namespace SampleWebApi.Model.RequestMissions
 {
     public class MissionReward
     {
-        public string ItemCode { get; set; }
+        public string ItemName { get; set; }
 
         bool IsRange { get; set; } = false;// true라면 MinCount~MaxCount,false라면 MinCount
         public int MinCount { get; set; }
@@ -17,7 +17,7 @@ namespace SampleWebApi.Model.RequestMissions
         {
             return new MissionReward
             {
-                ItemCode = SpecialItemNames.Crystal,
+                ItemName = ItemNames.Crystal,
                 MinCount = count,
             };
         }

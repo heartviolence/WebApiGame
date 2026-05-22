@@ -1,8 +1,6 @@
 ﻿using Assets.Scripts.Shared.GameDatas;
 using Microsoft.Extensions.Logging.Abstractions;
 using SampleWebApi.Model.Characters;
-using SampleWebApi.Model.Items;
-using SampleWebApi.Service;
 using SampleWebApi.Service.Characters;
 using SampleWebApi.Service.RequestMissions;
 using ServerShared.DbContexts;
@@ -77,16 +75,16 @@ namespace ServerTest
             UserAccountDetail userInfo = new()
             {
                 Username = "Test",
-                Crystal = 0,
+                GameItems = { new GameItem { Name = ItemNames.Crystal, Count = 0 } }
             };
-            List<GetMissionRewardEvent> createdEvents = _requestMissionService.ProcessCompleteMission(userInfo, "00-00-01");
+            GetMissionRewardEvent createdEvents = _requestMissionService.ProcessCompleteMission(userInfo, "00-00-01");
 
-            Assert.That(userInfo.Crystal == 100);
-            Assert.That(createdEvents.Count == 1);
-            Assert.That(createdEvents[0].ItemCode == SpecialItemNames.Crystal);
-            Assert.That(createdEvents[0].CompletedMissionCode == "00-00-01");
-            Assert.That(createdEvents[0].BeforeItemCount == 0);
-            Assert.That(createdEvents[0].AfterItemCount == 100);
+            Assert.That(userInfo.GameItems.Where(i => i.Name == ItemNames.Crystal).First().Count == 100);
+            Assert.That(createdEvents.ModifiedItems.Count == 1);
+            Assert.That(createdEvents.CompletedMissionCode == "00-00-01");
+            Assert.That(createdEvents.ModifiedItems[0].ItemName == ItemNames.Crystal);
+            Assert.That(createdEvents.ModifiedItems[0].BeforeCount == 0);
+            Assert.That(createdEvents.ModifiedItems[0].AfterCount == 100);
         }
     }
 

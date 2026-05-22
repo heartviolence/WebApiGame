@@ -10,9 +10,6 @@ namespace Assets.Scripts.Shared
         public string? Nickname { get; set; }
 
         public List<GameCharacterDTO> Characters { get; set; } = new();
-
-        public int Crystal { get; set; }
-
         public List<RequestMissionDTO> RequestMissions { get; set; } = new();
 
         public List<GameItemDTO> GameItems { get; set; } = new();

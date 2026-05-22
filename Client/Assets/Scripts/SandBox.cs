@@ -168,7 +168,7 @@ public class SandBox : MonoBehaviour
         _userInfo = await _userService.GetUserInfo();
         Debug.Log("유저정보 갱신완료");
         Show();
-        CrystalText.text = _userInfo.Crystal.ToString();
+        CrystalText.text = _userInfo.GameItems.Where(i => i.Name == ItemNames.Crystal).First().Count.ToString();
         var rankupItem = _userInfo.GameItems.Where(e => e.Name == ItemNames.CharacterRankUpMaterial).FirstOrDefault();
         RankUpText.text = rankupItem?.Count.ToString() ?? "0";
         var levelupItem = _userInfo.GameItems.Where(e => e.Name == ItemNames.CharacterLevelUpMaterial).FirstOrDefault();

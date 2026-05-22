@@ -1,4 +1,7 @@
-﻿namespace ServerShared.DbContexts
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+
+namespace ServerShared.DbContexts
 {
     public class GameCharacter
     {
@@ -13,6 +16,13 @@
         public int B_Skill_Level { get; set; } = 1;
 
         public int StarLevel { get; set; } = 0;
+
+        public int UserAccountDetailUserId { get; set; }
+
+        [JsonIgnore]
+        [ForeignKey(nameof(UserAccountDetailUserId))]
+        public UserAccountDetail user { get; set; }
+        
     }
 
 }

@@ -1,4 +1,7 @@
-﻿namespace ServerShared.DbContexts
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+
+namespace ServerShared.DbContexts
 {
     public class RequestMission
     {
@@ -7,13 +10,10 @@
 
         public DateTime StartTime { get; set; }
 
-        public static RequestMission Create(string missionCode)
-        {
-            return new RequestMission
-            {
-                MissionCode = missionCode,
-                StartTime = DateTime.Now,
-            };
-        }
+        public int UserAccountDetailUserId { get; set; }
+
+        [JsonIgnore]
+        [ForeignKey(nameof(UserAccountDetailUserId))]
+        public UserAccountDetail UserAccountDetail { get; set; }        
     }
 }

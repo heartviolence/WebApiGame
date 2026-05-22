@@ -2,10 +2,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SampleWebApi.Model.Items;
+using SampleWebApi.Service.Snapshots;
 using SampleWebApi.Service.Users.Items;
 using ServerShared.DbContexts;
+using ServerShared.Events;
+using ServerShared.Events.SandBox;
 using ServerShared.Shards;
+using ServerShared.Util;
 
 namespace SampleWebApi.Controllers.ForTest
 {
@@ -15,10 +18,12 @@ namespace SampleWebApi.Controllers.ForTest
     {
         ILogger _logger;
         GameItemService _gameItemService;
-        public SandBoxController(ILogger<SandBoxController> logger, GameItemService gameItemService)
+        SnapshotRollback _userSnapshot;
+        public SandBoxController(ILogger<SandBoxController> logger, GameItemService gameItemService, SnapshotRollback userSnapshot)
         {
             this._logger = logger;
             this._gameItemService = gameItemService;
+            this._userSnapshot = userSnapshot;
         }
 
         [HttpPost]
@@ -38,9 +43,21 @@ namespace SampleWebApi.Controllers.ForTest
                     .Include(u => u.GameItems)
                     .SingleOrDefault();
 
-                _gameItemService.AddItem(user, SpecialItemNames.Crystal, 100);
-                _gameItemService.AddItem(user, ItemNames.CharacterLevelUpMaterial, 10);
-                _gameItemService.AddItem(user, ItemNames.CharacterRankUpMaterial, 10);
+                var beforeCrystal = _gameItemService.AddItem(user, ItemNames.Crystal, 100);
+                var beforelevelupMat = _gameItemService.AddItem(user, ItemNames.CharacterLevelUpMaterial, 10);
+                var beforeRankupMat = _gameItemService.AddItem(user, ItemNames.CharacterRankUpMaterial, 10);
+
+                var gameEvent = new ShowMetheMoneyEvent()
+                {
+                    UserId = userId,
+                    ModifiedItems = new()
+                    {
+                        new ModifiedItemCountInfo() { ItemName = ItemNames.Crystal, BeforeCount = beforeCrystal, AfterCount=user.Crystal().Count},
+                        new ModifiedItemCountInfo() { ItemName = ItemNames.CharacterLevelUpMaterial, BeforeCount = beforelevelupMat,AfterCount = user.GameItem(ItemNames.CharacterLevelUpMaterial).Count  },
+                        new ModifiedItemCountInfo() { ItemName = ItemNames.CharacterRankUpMaterial, BeforeCount = beforeRankupMat,AfterCount = user.GameItem(ItemNames.CharacterRankUpMaterial).Count}
+                    }
+                };
+                context.GameEvents.Add(gameEvent.CovertToGameEvent());
                 user.RowVersion = Guid.NewGuid();
                 await context.SaveChangesAsync();
             }
@@ -81,6 +98,16 @@ namespace SampleWebApi.Controllers.ForTest
             }
 
             return Ok();
-        } 
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> SnapshotReplayTest()
+        {
+            await _userSnapshot.RollbackToSnapshot(5);
+
+            return Ok();
+        }
+
+
     }
 }

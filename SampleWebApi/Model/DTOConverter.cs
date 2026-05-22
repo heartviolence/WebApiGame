@@ -13,7 +13,6 @@ namespace SampleWebApi.Model
                 Username = x.Username,
                 Nickname = x.Nickname,
                 Characters = x.Characters.ConvertAll(x => x.DTO()),
-                Crystal = x.Crystal,
                 RequestMissions = x.RequestMissions.ConvertAll(x => x.DTO()),
                 GameItems = x.GameItems.ConvertAll(x => x.DTO()),
                 Records = x.Records.ConvertAll(x => x.DTO())

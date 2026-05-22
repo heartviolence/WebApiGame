@@ -8,8 +8,11 @@ namespace ServerShared.Events
     public class UseLevelUpItemEvent : IGameEvent
     {
         public int UserId { get; set; }
+        public int CharacterLevel { get; set; }
         public string CharacterName { get; set; }
         public List<ModifiedItemCountInfo> ModifiedItemCountInfo { get; set; } = new();
+        public int CharacterEXP { get; set; }
+
         public GameEvent CovertToGameEvent()
         {
             return new GameEvent
@@ -20,5 +23,5 @@ namespace ServerShared.Events
                 EventVersion = ServerVersion.Version,
             };
         }
-    }    
+    }
 }

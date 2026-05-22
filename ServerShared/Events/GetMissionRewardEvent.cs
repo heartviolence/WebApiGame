@@ -7,9 +7,7 @@ namespace ServerShared.Events
     {
         public int UserId { get; set; }
         public string CompletedMissionCode { get; set; }
-        public string ItemCode { get; set; }
-        public int BeforeItemCount { get; set; }
-        public int AfterItemCount { get; set; }
+        public List<ModifiedItemCountInfo> ModifiedItems { get; set; } = new();
         public GameEvent CovertToGameEvent()
         {
             return new GameEvent

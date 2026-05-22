@@ -1,5 +1,4 @@
 ﻿using Assets.Scripts.Shared.GameDatas;
-using SampleWebApi.Model.Items;
 using SampleWebApi.Service.Users.Items;
 using ServerShared.DbContexts;
 using ServerShared.Events;
@@ -39,9 +38,20 @@ namespace SampleWebApi.Service.Achievements
             };
         }
 
+        public void PlayGainAcheivementRewardsEvent(UserAccountDetail user, GainAcheivementRewardsEvent e)
+        {
+            foreach(var reward in e.Rewards)
+            {
+                _itemService.AddItem(user, reward.Name, reward.Count);
+            }
+            var completedAchievement = user.CompletedAchievements.First(a => a.AchievementName == e.AchievementName);
+            completedAchievement.RewardCheckPoint = e.AfterRewardCheckPoint;
+        }
+
+
         List<GameItem> GetAchievementRewards(string achievementCode, int level)
         {
-            return new() { new GameItem() { Id = -1, Name = SpecialItemNames.Crystal, Count = 1 } };
+            return new() { new GameItem() { Id = -1, Name = ItemNames.Crystal, Count = 1 } };
         }
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.OpenApi;
 using SampleWebApi.Service.Achievements;
 using SampleWebApi.Service.Characters;
 using SampleWebApi.Service.RequestMissions;
+using SampleWebApi.Service.Snapshots;
 using SampleWebApi.Service.Users;
 using SampleWebApi.Service.Users.Items;
 using Serilog;
@@ -69,6 +70,7 @@ builder.Services.AddScoped<CharacterService>();
 builder.Services.AddScoped<GameItemService>();
 builder.Services.AddScoped<AchievementService>();
 builder.Services.AddScoped<AchievementRepository>();
+builder.Services.AddScoped<SnapshotRollback>();
 builder.Services.AddScoped<IRequestMissionProvider>((service) => new RequestMissionProvider());
 builder.Services.AddScoped<IGameCharacterDataProvider>((service) => new GameCharacterDataProvider());
 

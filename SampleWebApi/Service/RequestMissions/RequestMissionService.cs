@@ -1,5 +1,4 @@
 ﻿using SampleWebApi.Model.Characters;
-using SampleWebApi.Model.Items;
 using SampleWebApi.Service.Characters;
 using ServerShared.DbContexts;
 using ServerShared.Events;
@@ -55,6 +54,38 @@ namespace SampleWebApi.Service.RequestMissions
             return true;
         }
 
+        public void PlayGetMissionRewardEvent(UserAccountDetail user, GetMissionRewardEvent e)
+        {
+            foreach (var modifiedItem in e.ModifiedItems)
+            {
+                var gameItem = user.GameItems.Where(i => i.Name == modifiedItem.ItemName).FirstOrDefault();
+                if (gameItem != null)
+                {
+                    gameItem.Count = modifiedItem.AfterCount;
+                }
+                else
+                {
+                    user.GameItems.Add(new GameItem() 
+                    {
+                        Name = modifiedItem.ItemName,
+                        Count = modifiedItem.AfterCount,
+                    });
+                }
+            }
+
+            user.RequestMissions.RemoveAll(m => m.MissionCode == e.CompletedMissionCode);
+        }
+
+        public void PlayRequestMissionStartEvent(UserAccountDetail user, RequestMissionStartEvent e)
+        {
+            var requestMission = new RequestMission()
+            {
+                MissionCode = e.MissionCode,
+                StartTime = e.StartTime,
+            };
+            user.RequestMissions.Add(requestMission);
+        }
+
         public bool IsMissionSuccess(string missionCode, List<GameCharacter> characters)
         {
             if (!_missionProvider.Missions.TryGetValue(missionCode, out var mission))
@@ -89,34 +120,34 @@ namespace SampleWebApi.Service.RequestMissions
             return true;
         }
 
-        public List<GetMissionRewardEvent> ProcessCompleteMission(UserAccountDetail userData, string completedMissionCode)
+        public GetMissionRewardEvent ProcessCompleteMission(UserAccountDetail userData, string completedMissionCode)
         {
-            List<GetMissionRewardEvent> events = new List<GetMissionRewardEvent>();
             var rewards = _missionProvider.Missions[completedMissionCode].Rewards;
+
+            var gameEvent = new GetMissionRewardEvent()
+            {
+                UserId = userData.UserId,
+                CompletedMissionCode = completedMissionCode
+            };
 
             foreach (var reward in rewards)
             {
-                switch (reward.ItemCode)
+                var gameItem = userData.GameItems.Where(i => i.Name == reward.ItemName).FirstOrDefault();
+                var beforeCount = 0;
+                if (gameItem != null)
                 {
-                    case SpecialItemNames.Crystal:
-                        int beforeCrystal = userData.Crystal;
-                        userData.Crystal += reward.MinCount;
-                        _logger.LogInformation("User의 크리스탈+{Crystal},적용후+{CrystalCurrent}", reward.MinCount, userData.Crystal);
-                        events.Add(new GetMissionRewardEvent()
-                        {
-                            UserId = userData.UserId,
-                            CompletedMissionCode = completedMissionCode,
-                            ItemCode = reward.ItemCode,
-                            BeforeItemCount = beforeCrystal,
-                            AfterItemCount = userData.Crystal
-                        });
-                        break;
-                    default:
-                        throw new Exception("등록되지않은 아이템 코드");
+                    beforeCount = gameItem.Count;
                 }
+                gameEvent.ModifiedItems.Add(new ModifiedItemCountInfo()
+                {
+                    ItemName = reward.ItemName,
+                    BeforeCount = beforeCount,
+                    AfterCount = beforeCount + reward.MinCount
+                });
             }
 
-            return events;
+            PlayGetMissionRewardEvent(userData, gameEvent);
+            return gameEvent;
         }
 
         public bool IsMissionComplete(RequestMission mission)

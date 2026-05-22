@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ServerShared.DbContexts;
 
@@ -11,9 +12,11 @@ using ServerShared.DbContexts;
 namespace ServerShared.Migrations.GameDB
 {
     [DbContext(typeof(GameDbContext))]
-    partial class GameDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260519124531_gameCharacterForeignkeyIsNotNull")]
+    partial class gameCharacterForeignkeyIsNotNull
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -56,7 +59,7 @@ namespace ServerShared.Migrations.GameDB
                     b.Property<int>("RewardCheckPoint")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserAccountDetailUserId")
+                    b.Property<int?>("UserAccountDetailUserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -168,7 +171,7 @@ namespace ServerShared.Migrations.GameDB
 
                     b.HasIndex("UserMailId");
 
-                    b.ToTable("GameItems");
+                    b.ToTable("GameItem");
                 });
 
             modelBuilder.Entity("ServerShared.DbContexts.ReceievedGrantItem", b =>
@@ -240,7 +243,7 @@ namespace ServerShared.Migrations.GameDB
 
                     b.HasIndex("UserAccountDetailUserId");
 
-                    b.ToTable("RequestMission");
+                    b.ToTable("RequestMissions");
                 });
 
             modelBuilder.Entity("ServerShared.DbContexts.UserAccountDetail", b =>
@@ -295,7 +298,7 @@ namespace ServerShared.Migrations.GameDB
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserAccountDetailUserId")
+                    b.Property<int?>("UserAccountDetailUserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -307,13 +310,9 @@ namespace ServerShared.Migrations.GameDB
 
             modelBuilder.Entity("ServerShared.DbContexts.CompletedAchievement", b =>
                 {
-                    b.HasOne("ServerShared.DbContexts.UserAccountDetail", "UserAccountDetail")
+                    b.HasOne("ServerShared.DbContexts.UserAccountDetail", null)
                         .WithMany("CompletedAchievements")
-                        .HasForeignKey("UserAccountDetailUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("UserAccountDetail");
+                        .HasForeignKey("UserAccountDetailUserId");
                 });
 
             modelBuilder.Entity("ServerShared.DbContexts.GameCharacter", b =>
@@ -380,13 +379,9 @@ namespace ServerShared.Migrations.GameDB
 
             modelBuilder.Entity("ServerShared.DbContexts.UserMail", b =>
                 {
-                    b.HasOne("ServerShared.DbContexts.UserAccountDetail", "UserAccountDetail")
+                    b.HasOne("ServerShared.DbContexts.UserAccountDetail", null)
                         .WithMany("MailBox")
-                        .HasForeignKey("UserAccountDetailUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("UserAccountDetail");
+                        .HasForeignKey("UserAccountDetailUserId");
                 });
 
             modelBuilder.Entity("ServerShared.DbContexts.UserAccountDetail", b =>

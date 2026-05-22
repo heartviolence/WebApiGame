@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using SampleWebApi.Model;
 using SampleWebApi.Service.Users;
 using ServerShared.DbContexts;
+using ServerShared.Events.SandBox;
 using ServerShared.Shards;
 
 namespace SampleWebApi.Controllers
@@ -48,8 +49,8 @@ namespace SampleWebApi.Controllers
             }
 
             var userInfo = await _repository.GetUserInfo(userId);
-            if(userInfo == null)
-            { 
+            if (userInfo == null)
+            {
                 _logger.LogInformation("유저데이터를 찾지못함 userId:{UserId}", userId);
                 return NotFound();
             }
@@ -74,7 +75,13 @@ namespace SampleWebApi.Controllers
                     .Include(u => u.Characters)
                     .FirstOrDefault();
 
-                context.GameCharacters.RemoveRange(user.Characters);
+                var gameEvent = new DeleteAllEvent()
+                {
+                    UserId = userId,
+                };
+                user.Characters.Clear();
+                user.RowVersion = Guid.NewGuid();
+                context.GameEvents.Add(gameEvent.CovertToGameEvent());
                 await context.SaveChangesAsync();
             }
 
@@ -91,10 +98,13 @@ namespace SampleWebApi.Controllers
                 return BadRequest();
             }
 
-            await _repository.CharacterGacha(userId);
-            _logger.LogInformation("캐릭터 추가 성공 userId:{UserId}", userId);
+            var ErrorCode = await _repository.CharacterGacha(userId);
+            if (ErrorCode == 0)
+            {
+                _logger.LogInformation("캐릭터 추가 성공 userId:{UserId}", userId);
+            }
             return Ok();
-        }        
+        }
 
     }
 }
