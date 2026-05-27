@@ -53,8 +53,9 @@ public class SandBox : MonoBehaviour
     void Start()
     {
         _client = new HttpClient();
-        _client.BaseAddress = new System.Uri("https://localhost:7067/");
+        _client.BaseAddress = new System.Uri("https://localhost:7055/");
         _client.Timeout = TimeSpan.FromSeconds(5);
+        _client.DefaultRequestHeaders.Add("ServerNumber", "0");
         GameApiClient.Client = _client;
 
         GachaButton.onClick.AddListener(() => Gacha());

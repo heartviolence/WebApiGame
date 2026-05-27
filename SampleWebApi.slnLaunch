@@ -13,6 +13,10 @@
       {
         "Path": "EventCollector\\EventCollector.csproj",
         "Action": "Start"
+      },
+      {
+        "Path": "ReverseProxy\\ReverseProxy.csproj",
+        "Action": "Start"
       }
     ]
   }
