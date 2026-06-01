@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SampleWebApi.Model;
 using SampleWebApi.Service.Games;
+using SampleWebApi.UserHealthPings;
 using ServerShared.DbContexts;
 using ServerShared.Shards;
 using System.Text.Json;
@@ -22,6 +23,7 @@ namespace SampleWebApi.Controllers
 
         [HttpPost]
         [Authorize]
+        [TypeFilter(typeof(UserHealthFilter))]
         public async Task<string> Start()
         {
             if (!int.TryParse(User.FindFirst("userId")?.Value, out var userId))
@@ -47,6 +49,7 @@ namespace SampleWebApi.Controllers
 
         [HttpPost]
         [Authorize]
+        [TypeFilter(typeof(UserHealthFilter))]
         public async Task<string> SelectNPC(int index)
         {
             if (!int.TryParse(User.FindFirst("userId")?.Value, out var userId))
@@ -72,6 +75,7 @@ namespace SampleWebApi.Controllers
 
         [HttpPost]
         [Authorize]
+        [TypeFilter(typeof(UserHealthFilter))]
         public async Task<string> SelectCard(int index)
         {
             if (!int.TryParse(User.FindFirst("userId")?.Value, out var userId))
@@ -97,6 +101,7 @@ namespace SampleWebApi.Controllers
 
         [HttpPost]
         [Authorize]
+        [TypeFilter(typeof(UserHealthFilter))]
         public async Task<string> PowerUp()
         {
             if (!int.TryParse(User.FindFirst("userId")?.Value, out var userId))
@@ -121,6 +126,7 @@ namespace SampleWebApi.Controllers
 
         [HttpPost]
         [Authorize]
+        [TypeFilter(typeof(UserHealthFilter))]
         public async Task<string> NextFloor()
         {
             if (!int.TryParse(User.FindFirst("userId")?.Value, out var userId))
@@ -146,6 +152,7 @@ namespace SampleWebApi.Controllers
 
         [HttpPost]
         [Authorize]
+        [TypeFilter(typeof(UserHealthFilter))]
         public async Task<string> BattleEnd()
         {
             if (!int.TryParse(User.FindFirst("userId")?.Value, out var userId))

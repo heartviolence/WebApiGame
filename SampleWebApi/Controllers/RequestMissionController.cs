@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SampleWebApi.Service.RequestMissions;
+using SampleWebApi.UserHealthPings;
 using System.Text.Json;
 
 namespace SampleWebApi.Controllers
@@ -20,6 +21,7 @@ namespace SampleWebApi.Controllers
 
         [HttpPost]
         [Authorize]
+        [TypeFilter(typeof(UserHealthFilter))]
         public async Task<ActionResult<bool>> StartMission(RequestMissionStartRequest request)
         {
             if (!int.TryParse(User.FindFirst("userId")?.Value, out var userId))
@@ -42,6 +44,7 @@ namespace SampleWebApi.Controllers
 
         [HttpPut]
         [Authorize]
+        [TypeFilter(typeof(UserHealthFilter))]
         public async Task<ActionResult> RequestMissionCompleteCheck()
         {
             if (!int.TryParse(User.FindFirst("userId")?.Value, out var userId))

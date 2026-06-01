@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SampleWebApi.Service.Achievements;
+using SampleWebApi.UserHealthPings;
 
 namespace SampleWebApi.Controllers
 {
@@ -18,6 +19,7 @@ namespace SampleWebApi.Controllers
 
         [HttpPost]
         [Authorize]
+        [TypeFilter(typeof(UserHealthFilter))]
         public async Task<ActionResult> GainAcheivementRewards(string achievementName)
         {
             if (!int.TryParse(User.FindFirst("userId")?.Value, out var userId))

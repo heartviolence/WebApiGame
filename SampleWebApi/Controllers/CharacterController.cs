@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SampleWebApi.Model;
 using SampleWebApi.Service.Characters;
+using SampleWebApi.UserHealthPings;
 
 namespace SampleWebApi.Controllers
 {
@@ -20,6 +21,7 @@ namespace SampleWebApi.Controllers
 
         [HttpPost]
         [Authorize]
+        [TypeFilter(typeof(UserHealthFilter))]
         public async Task<GameCharacterDTO> UseLevelUpItem(string characterName, int itemCount)
         {
             if (!int.TryParse(User.FindFirst("userId")?.Value, out var userId))
@@ -39,6 +41,7 @@ namespace SampleWebApi.Controllers
 
         [HttpPost]
         [Authorize]
+        [TypeFilter(typeof(UserHealthFilter))]
         public async Task<GameCharacterDTO> RankUp(string characterName)
         {
             if (!int.TryParse(User.FindFirst("userId")?.Value, out var userId))

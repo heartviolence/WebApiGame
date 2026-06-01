@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SampleWebApi.Model;
 using SampleWebApi.Service.Users;
+using SampleWebApi.UserHealthPings;
 using ServerShared.DbContexts;
 using ServerShared.Events.SandBox;
 using ServerShared.Shards;
@@ -25,6 +26,7 @@ namespace SampleWebApi.Controllers
 
         [Authorize]
         [HttpGet]
+        [TypeFilter(typeof(UserHealthFilter))]
         public async Task<ActionResult<List<GameCharacterDTO>>> GetCharacters()
         {
             if (!int.TryParse(User.FindFirst("userId")?.Value, out var userId))
@@ -40,6 +42,7 @@ namespace SampleWebApi.Controllers
 
         [Authorize]
         [HttpGet]
+        [TypeFilter(typeof(UserHealthFilter))]
         public async Task<ActionResult<UserInfoDTO>> GetUserInfo()
         {
             if (!int.TryParse(User.FindFirst("userId")?.Value, out var userId))
@@ -61,6 +64,7 @@ namespace SampleWebApi.Controllers
 
         [Authorize]
         [HttpDelete]
+        [TypeFilter(typeof(UserHealthFilter))]
         public async Task<ActionResult> DeleteAll()
         {
             if (!int.TryParse(User.FindFirst("userId")?.Value, out var userId))
@@ -90,6 +94,7 @@ namespace SampleWebApi.Controllers
 
         [HttpPost]
         [Authorize]
+        [TypeFilter(typeof(UserHealthFilter))]
         public async Task<ActionResult> Gacha()
         {
             if (!int.TryParse(User.FindFirst("userId")?.Value, out var userId))

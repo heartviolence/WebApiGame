@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SampleWebApi.Service.Snapshots;
 using SampleWebApi.Service.Users.Items;
+using SampleWebApi.UserHealthPings;
 using ServerShared.DbContexts;
 using ServerShared.Events;
 using ServerShared.Events.SandBox;
@@ -28,6 +29,7 @@ namespace SampleWebApi.Controllers.ForTest
 
         [HttpPost]
         [Authorize]
+        [TypeFilter(typeof(UserHealthFilter))]
         public async Task<ActionResult> ShowMeTheMoney()
         {
             if (!int.TryParse(User.FindFirst("userId")?.Value, out var userId))
