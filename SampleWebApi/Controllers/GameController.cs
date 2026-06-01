@@ -27,6 +27,7 @@ namespace SampleWebApi.Controllers
             if (!int.TryParse(User.FindFirst("userId")?.Value, out var userId))
             {
                 _logger.LogInformation("토큰에서 UserId를 찾지못함");
+                return null;
             }
 
             await using (var context = await GameDbUtil.CreateGameDbContext(userId))
@@ -51,6 +52,7 @@ namespace SampleWebApi.Controllers
             if (!int.TryParse(User.FindFirst("userId")?.Value, out var userId))
             {
                 _logger.LogInformation("토큰에서 UserId를 찾지못함");
+                return null;
             }
 
             await using (var context = await GameDbUtil.CreateGameDbContext(userId))
@@ -75,6 +77,7 @@ namespace SampleWebApi.Controllers
             if (!int.TryParse(User.FindFirst("userId")?.Value, out var userId))
             {
                 _logger.LogInformation("토큰에서 UserId를 찾지못함");
+                return null;
             }
 
             await using (var context = await GameDbUtil.CreateGameDbContext(userId))
@@ -99,6 +102,7 @@ namespace SampleWebApi.Controllers
             if (!int.TryParse(User.FindFirst("userId")?.Value, out var userId))
             {
                 _logger.LogInformation("토큰에서 UserId를 찾지못함");
+                return null;
             }
             await using (var context = await GameDbUtil.CreateGameDbContext(userId))
             {
@@ -122,6 +126,7 @@ namespace SampleWebApi.Controllers
             if (!int.TryParse(User.FindFirst("userId")?.Value, out var userId))
             {
                 _logger.LogInformation("토큰에서 UserId를 찾지못함");
+                return null;
             }
 
             await using (var context = await GameDbUtil.CreateGameDbContext(userId))
@@ -146,6 +151,7 @@ namespace SampleWebApi.Controllers
             if (!int.TryParse(User.FindFirst("userId")?.Value, out var userId))
             {
                 _logger.LogInformation("토큰에서 UserId를 찾지못함");
+                return null;
             }
 
             await using (var context = await GameDbUtil.CreateGameDbContext(userId))

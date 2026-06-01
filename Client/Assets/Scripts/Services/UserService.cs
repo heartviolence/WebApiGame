@@ -28,17 +28,17 @@ namespace Assets.Scripts.Services
 
         public async Task<UserInfoDTO> GetUserInfo()
         {
-            return await ApiCallHelper.GetAsync<UserInfoDTO>($"User/GetUserInfo");
+            return await ApiCallHelper.GetAsync<UserInfoDTO>(GameApiClient.Client, $"User/GetUserInfo");
         }
 
         public async Task Gacha()
         {
-            await ApiCallHelper.PostAsync($"User/Gacha");
+            await ApiCallHelper.PostAsync(GameApiClient.Client, $"User/Gacha");
         }
 
         public async Task DeleteAll()
         {
-            await ApiCallHelper.DeleteAsync($"User/DeleteAll");
+            await ApiCallHelper.DeleteAsync(GameApiClient.Client, $"User/DeleteAll");
         }
 
     }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Scripts.Shared;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -26,7 +27,12 @@ namespace Assets.Scripts.Services
                 Password = password
             };
 
-            return await ApiCallHelper.PostAsync<LoginRequest, RegisterResponse>("Login/Register", loginRequest);
+            return await ApiCallHelper.PostAsync<LoginRequest, RegisterResponse>(GameApiClient.Client,"Login/Register", loginRequest);
+        }
+
+        public async Task<bool> HealthPing(string username)
+        {
+            return await ApiCallHelper.PostAsync<bool>(GameApiClient.Client, $"Login/HealthPing?username={username}");
         }
 
         public async Task<LoginResponse> Login(string username, string password)
@@ -36,7 +42,7 @@ namespace Assets.Scripts.Services
                 Username = username,
                 Password = password
             };
-            var loginResponse = await ApiCallHelper.PostAsync<LoginRequest, LoginResponse>("Login/Login", loginRequest);
+            var loginResponse = await ApiCallHelper.PostAsync<LoginRequest, LoginResponse>(GameApiClient.Client, "Login/Login", loginRequest);
             GameApiClient.Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResponse.Token);
             return loginResponse;
         }

@@ -10,7 +10,7 @@ namespace Assets.Scripts.Services
     {
         public async Task GainAchievementRewards(string achievementName)
         {
-            await ApiCallHelper.PostAsync($"Achievement/GainAcheivementRewards?achievementName={achievementName}");
+            await ApiCallHelper.PostAsync(GameApiClient.Client, $"Achievement/GainAcheivementRewards?achievementName={achievementName}");
         }
     }
 }

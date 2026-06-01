@@ -15,12 +15,12 @@ namespace Assets.Scripts.Services
 
         public async Task<GameCharacterDTO> UseLevelUpItem(string characterId, int itemCount)
         {
-            return await ApiCallHelper.PostAsync<GameCharacterDTO>($"Character/UseLevelUpItem?characterName={characterId}&itemCount={itemCount}");
+            return await ApiCallHelper.PostAsync<GameCharacterDTO>(GameApiClient.Client, $"Character/UseLevelUpItem?characterName={characterId}&itemCount={itemCount}");
         }
 
         public async Task<GameCharacterDTO> RankUp(string characterId)
         {
-            return await ApiCallHelper.PostAsync<GameCharacterDTO>($"Character/RankUp?characterName={characterId}");
+            return await ApiCallHelper.PostAsync<GameCharacterDTO>(GameApiClient.Client, $"Character/RankUp?characterName={characterId}");
         }
     }
 }

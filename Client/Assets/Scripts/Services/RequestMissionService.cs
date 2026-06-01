@@ -20,12 +20,12 @@ namespace Assets.Scripts.Services
                 CharacterCode = new() { "Sora", "Flora" }
             };
 
-            return await ApiCallHelper.PostAsync<RequestMissionStartRequest, bool>($"RequestMission/StartMission", requestBody);
+            return await ApiCallHelper.PostAsync<RequestMissionStartRequest, bool>(GameApiClient.Client, $"RequestMission/StartMission", requestBody);
         }
 
         public async Task RequestMissionCompleteCheck()
         {
-            await ApiCallHelper.PutAsync($"RequestMission/RequestMissionCompleteCheck");
+            await ApiCallHelper.PutAsync(GameApiClient.Client, $"RequestMission/RequestMissionCompleteCheck");
         }
     }
 }

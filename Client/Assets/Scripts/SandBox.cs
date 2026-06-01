@@ -7,14 +7,16 @@ using Assets.Scripts.UIs;
 using System;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using TMPro;
+using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class SandBox : MonoBehaviour
 {
-    HttpClient _client;
+    HttpClient _gameApiclient;
 
     public Button GachaButton;
     public Button CharacterDeleteButton;
@@ -50,14 +52,10 @@ public class SandBox : MonoBehaviour
     GameService _gameService = new();
 
     UserInfoDTO _userInfo;
+
+    CancellationTokenSource _HealthPingCts = new();
     void Start()
     {
-        _client = new HttpClient();
-        _client.BaseAddress = new System.Uri("https://localhost:7055/");
-        _client.Timeout = TimeSpan.FromSeconds(5);
-        _client.DefaultRequestHeaders.Add("ServerNumber", "0");
-        GameApiClient.Client = _client;
-
         GachaButton.onClick.AddListener(() => Gacha());
         CharacterDeleteButton.onClick.AddListener(() => DeleteAll());
         RequestMissionStartButton.onClick.AddListener(() => RequestMissionStart());
@@ -74,10 +72,42 @@ public class SandBox : MonoBehaviour
         PowerUpButton.onClick.AddListener(() => PowerUp());
         NextFloorButton.onClick.AddListener(() => NextFloor());
         BattleEndButton.onClick.AddListener(() => BattleEnd());
-        LoginButton.onClick.AddListener(() => Login());
+        LoginButton.onClick.AddListener(() => Login(LoginUsernameInputfield.text));
         LogoutButton.onClick.AddListener(() => LogOut());
     }
 
+    async Task FindServer(string username)
+    {
+
+
+    }
+    async Task HealthPing(string username, CancellationToken ct)
+    {
+        bool healthPingResult = false;
+        try
+        {
+            while (!ct.IsCancellationRequested)
+            {
+                healthPingResult = await _loginService.HealthPing(username);
+                if (!healthPingResult)
+                {
+                    Debug.Log($"HealthPing Result: {healthPingResult}");
+                    break;
+                }
+                await Task.Delay(5000);
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+        }
+
+        await Task.Delay(1000);
+        if (!ct.IsCancellationRequested && healthPingResult)
+        {
+            Login(username);
+        }
+    }
     async Task GameStateStart()
     {
         var state = await _gameService.Start();
@@ -129,22 +159,53 @@ public class SandBox : MonoBehaviour
     {
         await _loginService.Logout();
     }
-    async Task Login()
+    async Task Login(string username)
     {
-        var username = LoginUsernameInputfield.text;
+        string serverNumberString = string.Empty;
+        int retryCount = 0;
+        int maxCount = 5;
+        for (retryCount = 0; retryCount < maxCount; retryCount++)
+        {
+            try
+            {
+                Debug.Log("Start FindServer");
+                var findServerClient = new HttpClient();
+                findServerClient.Timeout = TimeSpan.FromSeconds(5);
+                findServerClient.BaseAddress = new System.Uri("https://localhost:7232/");
+                FindServerClient.Client = findServerClient;
+                var response = await findServerClient.PostAsync($"GameserverManager/FindServer?username={username}", new StringContent(""), cancellationToken: destroyCancellationToken);
+                response.EnsureSuccessStatusCode();
+                serverNumberString = await response.Content.ReadAsStringAsync();
+                Debug.Log($"FindServerNumber : {serverNumberString}");
 
-        try
-        {
-            await _loginService.Register(username, "password");
-            await Task.Delay(2000);
-            await _loginService.Login(username, "password");
-            Debug.Log("로그인 완료");
+                _gameApiclient = new HttpClient();
+                _gameApiclient.BaseAddress = new System.Uri("https://localhost:7055/");
+                _gameApiclient.Timeout = TimeSpan.FromSeconds(5);
+                _gameApiclient.DefaultRequestHeaders.Add("ServerNumber", serverNumberString);
+                GameApiClient.Client = _gameApiclient;
+
+                await _loginService.Register(username, "password");
+                await Task.Delay(2000);
+                await _loginService.Login(username, "password");
+                Debug.Log("로그인 완료");
+                break;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                retryCount++;
+                Debug.Log($"retryCount:{retryCount}");
+            }
         }
-        catch (Exception ex)
+
+        if (retryCount == maxCount)
         {
-            Debug.LogException(ex);
+            Debug.Log($"retryCount is max,Count:{retryCount}");
             return;
         }
+        _HealthPingCts.Cancel();
+        _HealthPingCts = new();
+        HealthPing(username, _HealthPingCts.Token);
         await UserInfo();
         Show();
     }

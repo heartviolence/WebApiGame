@@ -16,7 +16,7 @@ namespace Assets.Scripts.Services
 
         public async Task ShowMetheMoney()
         {
-            await ApiCallHelper.PostAsync("SandBox/ShowMetheMoney");
+            await ApiCallHelper.PostAsync(GameApiClient.Client, "SandBox/ShowMetheMoney");
         }
     }
 }

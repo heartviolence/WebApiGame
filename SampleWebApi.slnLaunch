@@ -17,6 +17,10 @@
       {
         "Path": "ReverseProxy\\ReverseProxy.csproj",
         "Action": "Start"
+      },
+      {
+        "Path": "GameserverManager\\GameserverManager.csproj",
+        "Action": "Start"
       }
     ]
   }

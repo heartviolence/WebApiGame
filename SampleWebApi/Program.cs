@@ -8,6 +8,7 @@ using SampleWebApi.Service.RequestMissions;
 using SampleWebApi.Service.Snapshots;
 using SampleWebApi.Service.Users;
 using SampleWebApi.Service.Users.Items;
+using SampleWebApi.UserHealthPings;
 using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Json;
@@ -73,7 +74,8 @@ builder.Services.AddScoped<AchievementRepository>();
 builder.Services.AddScoped<SnapshotRollback>();
 builder.Services.AddScoped<IRequestMissionProvider>((service) => new RequestMissionProvider());
 builder.Services.AddScoped<IGameCharacterDataProvider>((service) => new GameCharacterDataProvider());
-
+builder.Services.AddSingleton<UserHealthPing>();
+builder.Services.AddHostedService<UserAllocationWorker>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
