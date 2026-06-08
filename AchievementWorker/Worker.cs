@@ -1,3 +1,6 @@
+using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.Security;
+using Elastic.Transport;
 using Microsoft.EntityFrameworkCore;
 using NATS.Client.JetStream;
 using NATS.Client.JetStream.Models;
@@ -9,10 +12,17 @@ using System.Text.Json;
 
 namespace AchievementWorker
 {
-    public class Worker(ILogger<Worker> logger) : BackgroundService
+    public class Worker : BackgroundService
     {
         NatsClient nc;
-        INatsJSContext js;
+        INatsJSContext js;        
+        ILogger _logger;
+
+        public Worker(ILogger<Worker> logger)
+        {
+            this._logger = logger;           
+        }
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             await ConnectNats();
@@ -48,14 +58,14 @@ namespace AchievementWorker
                 await foreach (NatsJSMsg<GameEvent> msg in consumer.ConsumeAsync<GameEvent>())
                 {
                     GameEvent data = msg.Data;
-                    logger.LogInformation("{data}", data.EventType);
+                    _logger.LogInformation("{data}", data.EventType);
                     await ProcessUserCreateEvent(data);
                     await msg.AckAsync();
                 }
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error in UserAccountWork");
+                _logger.LogError(ex, "Error in UserAccountWork");
             }
         }
 
@@ -73,7 +83,7 @@ namespace AchievementWorker
                 var account = await accountContext.UserAccounts.Where(a => a.Username == userCreateEvent.Username).SingleOrDefaultAsync();
                 if (account == null)
                 {
-                    logger.LogInformation("flush OldMessage");
+                    _logger.LogInformation("flush OldMessage");
                     return;
                 }
                 userId = account.UserId;
@@ -96,7 +106,7 @@ namespace AchievementWorker
                 context.UserDetails.Add(user);
                 context.GameEvents.Add(detailCreatedEvent.CovertToGameEvent());
                 await context.SaveChangesAsync();
-                logger.LogInformation("UserDetailCreated. Username: {Username}, UserId: {UserId},Shard: {freeDb}.", user.Username, user.UserId, freeDb);
+                _logger.LogInformation("UserDetailCreated. Username: {Username}, UserId: {UserId},Shard: {freeDb}.", user.Username, user.UserId, freeDb);
             }
 
         }
@@ -104,7 +114,7 @@ namespace AchievementWorker
 
         async Task ProcessEvent(GameEvent e)
         {
-            logger.LogInformation("eventId:{EventId},eventType:{EventType}", e.Id, e.EventType);
+            _logger.LogInformation("eventId:{EventId},eventType:{EventType}", e.Id, e.EventType);
 
             switch (e.EventType)
             {
@@ -146,5 +156,11 @@ namespace AchievementWorker
                 await context.SaveChangesAsync();
             }
         }
+
+        public override async Task StopAsync(CancellationToken cancellationToken)
+        {
+            await nc.DisposeAsync();
+            await base.StopAsync(cancellationToken);
+        }        
     }
 }

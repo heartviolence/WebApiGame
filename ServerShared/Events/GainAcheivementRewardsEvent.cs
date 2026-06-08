@@ -15,6 +15,9 @@ namespace ServerShared.Events
 
         public List<GameItem> Rewards { get; set; } = new();
 
+        public string EventVersion { get; set; } = ServerVersion.Version;
+
+        public DateTime TimeStamp { get; set; } = DateTime.UtcNow;
         public GameEvent CovertToGameEvent()
         {
             return new GameEvent

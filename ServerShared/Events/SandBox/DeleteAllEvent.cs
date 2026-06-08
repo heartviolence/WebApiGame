@@ -9,6 +9,10 @@ namespace ServerShared.Events.SandBox
     {
         public int UserId { get; set; }
 
+        public string EventVersion { get; set; } = ServerVersion.Version;
+
+        public DateTime TimeStamp { get; set; } = DateTime.UtcNow;
+
         public GameEvent CovertToGameEvent()
         {
             return new GameEvent

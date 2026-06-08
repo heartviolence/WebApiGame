@@ -13,6 +13,9 @@ namespace ServerShared.Events
         public int AfterRank { get; set; }
 
         public List<ModifiedItemCountInfo> ModifiedItemCountInfo { get; set; } = new();
+        public string EventVersion { get; set; } = ServerVersion.Version;
+
+        public DateTime TimeStamp { get; set; } = DateTime.UtcNow;
 
         public GameEvent CovertToGameEvent()
         {

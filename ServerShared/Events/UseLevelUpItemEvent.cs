@@ -12,6 +12,9 @@ namespace ServerShared.Events
         public string CharacterName { get; set; }
         public List<ModifiedItemCountInfo> ModifiedItemCountInfo { get; set; } = new();
         public int CharacterEXP { get; set; }
+        public string EventVersion { get; set; } = ServerVersion.Version;
+
+        public DateTime TimeStamp { get; set; } = DateTime.UtcNow;
 
         public GameEvent CovertToGameEvent()
         {

@@ -8,6 +8,9 @@ namespace ServerShared.Events
         public string MissionCode { get; set; }
         public DateTime StartTime { get; set; }
         public List<string> CharacterCodes { get; set; } = new();
+        public string EventVersion { get; set; } = ServerVersion.Version;
+
+        public DateTime TimeStamp { get; set; } = DateTime.UtcNow;
         public GameEvent CovertToGameEvent()
         {
             return new GameEvent

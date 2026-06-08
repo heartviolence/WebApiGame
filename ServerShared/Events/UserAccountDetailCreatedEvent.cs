@@ -11,6 +11,9 @@ namespace ServerShared.Events
         public int UserId { get; set; }
 
         public int ShardNumber { get; set; }
+        public string EventVersion { get; set; } = ServerVersion.Version;
+
+        public DateTime TimeStamp { get; set; } = DateTime.UtcNow;
         public GameEvent CovertToGameEvent()
         {
             return new GameEvent

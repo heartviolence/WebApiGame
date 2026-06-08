@@ -8,6 +8,9 @@ namespace ServerShared.Events
         public int UserId { get; set; }
         public string CompletedMissionCode { get; set; }
         public List<ModifiedItemCountInfo> ModifiedItems { get; set; } = new();
+        public string EventVersion { get; set; } = ServerVersion.Version;
+
+        public DateTime TimeStamp { get; set; } = DateTime.UtcNow;
         public GameEvent CovertToGameEvent()
         {
             return new GameEvent

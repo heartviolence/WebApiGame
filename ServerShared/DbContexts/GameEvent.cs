@@ -14,6 +14,6 @@
 
         public string EventVersion { get; set; } //이벤트 처리기 버전관리용
 
-        public string Description { get; set; } = string.Empty;//로그
+        public string Description { get; set; } = string.Empty;//
     }
 }

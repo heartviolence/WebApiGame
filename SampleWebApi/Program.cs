@@ -21,10 +21,10 @@ Log.Logger = new LoggerConfiguration()
     //.MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Information)
     .Enrich.FromLogContext()
     .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
-    //.WriteTo.File(new JsonFormatter(),
-    //    "logs/log-.json",
-    //    rollingInterval: RollingInterval.Day,
-    //    retainedFileCountLimit: 7)
+    .WriteTo.File(new JsonFormatter(),
+        "logs/log-.json",
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 7)
     .CreateLogger();
 
 builder.Host.UseSerilog();

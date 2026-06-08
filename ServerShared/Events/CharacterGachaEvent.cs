@@ -11,6 +11,9 @@ namespace ServerShared.Events
         public int BeforeCrystal { get; set; }
 
         public int AfterCrystal { get; set; }
+        public string EventVersion { get; set; } = ServerVersion.Version;
+
+        public DateTime TimeStamp { get; set; } = DateTime.UtcNow;
 
         public GameEvent CovertToGameEvent()
         {
