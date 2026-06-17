@@ -53,6 +53,9 @@
 
 -메일함
 
+## 서버 구성 요약
+<img width="597" height="333" alt="서버구성" src="https://github.com/user-attachments/assets/331e44ad-5d73-4eae-9744-8721bdded63e" />
+
 ## 테스트
 
 
